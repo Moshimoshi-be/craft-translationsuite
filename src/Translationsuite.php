@@ -1,6 +1,6 @@
 <?php
 /**
- * Translationsuite plugin for Craft CMS 3.x
+ * Translation Suite plugin for Craft CMS 3.x
  *
  * The one and only translation plugin you'll ever need.
  *
@@ -12,9 +12,10 @@ namespace moshimoshi\translationsuite;
 
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
+use craft\i18n\I18N;
 use craft\services\UserPermissions;
-use moshimoshi\translationsuite\assetbundles\translationsuite\TranslationsuiteAsset;
-use moshimoshi\translationsuite\services\TranslationsuiteService as TranslationsuiteServiceService;
+use moshimoshi\translationsuite\services\MessageSource;
+use moshimoshi\translationsuite\services\TranslationsuiteService;
 use moshimoshi\translationsuite\variables\TranslationsuiteVariable;
 use moshimoshi\translationsuite\models\Settings;
 
@@ -44,7 +45,7 @@ use yii\base\Event;
  * @package   Translationsuite
  * @since     1.0.0
  *
- * @property  TranslationsuiteServiceService $translationsuiteService
+ * @property  TranslationsuiteService $translationsuiteService
  * @property  VitePluginService $vite
  * @method    Settings getSettings()
  */
@@ -102,7 +103,8 @@ class Translationsuite extends Plugin
     public function __construct($id, $parent = null, array $config = [])
     {
         $config['components'] = [
-            'translationsuite' => Translationsuite::class,
+            'translationsuite' => __CLASS__,
+            'messageSource' => MessageSource::class,
             // Register the vite service
             'vite' => [
                 'class' => VitePluginService::class,
@@ -118,6 +120,7 @@ class Translationsuite extends Plugin
 
         parent::__construct($id, $parent, $config);
     }
+
 
     // Public Methods
     // =========================================================================

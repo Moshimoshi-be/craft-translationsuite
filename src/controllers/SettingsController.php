@@ -36,6 +36,8 @@ class SettingsController extends Controller
         $variables = $this->setCommonVariables();
         $variables['showWelcome'] = $showWelcome;
 
+
+
         if ($showWelcome) {
             $variables['title'] = Craft::t('translationsuite', "Welcome!");
             unset($variables['selectedSubnavItem']);

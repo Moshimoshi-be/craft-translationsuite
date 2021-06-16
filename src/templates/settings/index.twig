@@ -1,0 +1,48 @@
+{% extends "translationsuite/_layouts/translationsuite_cp.twig" %}
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset") %}
+
+{# Page specific scripts #}
+{% block head %}
+    {{ parent() }}
+    {% set scriptTagOptions = {
+        'depends': [
+            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
+        ],
+    } %}
+{% endblock %}
+
+{# The content of the CP Section#}
+{% block content %}
+    <input type="hidden" name="action" value="translationsuite/settings/save-settings">
+    <input type="hidden" name="pluginHandle" value="translationsuite">
+
+    {{ redirectInput("translationsuite/settings") }}
+    {% namespace 'settings' %}
+        <div class="w-2/3">
+            {{ forms.textField({
+                label: 'Plugin name',
+                id: 'pluginName',
+                name: 'pluginName',
+                value: settings['pluginName']
+            }) }}
+            <div class="a-lightswitch">
+                <div class="a-lightswitch__field">
+                    {{ forms.lightswitch({
+                        label: 'Use Translation files?',
+                        id: 'useTranslationFiles',
+                        name: 'useTranslationFiles',
+                        on: settings['useTranslationFiles'],
+                        instructions: 'test'
+                    }) }}
+                </div>
+                <div id="useTranslationFiles-desc" class="a-lightswitch__description">
+                    Enabling this option will fetch translations from the translations directory, translations in this
+                    file can then be overwritten with the UI.
+                </div>
+            </div>
+        </div>
+
+    {% endnamespace %}
+{% endblock %}

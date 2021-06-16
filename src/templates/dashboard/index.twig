@@ -1,0 +1,39 @@
+{% extends "translationsuite/_layouts/translationsuite_cp.twig" %}
+{% do view.registerAssetBundle("moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset") %}
+
+{# Page specific scripts #}
+{% block head %}
+    {{ parent() }}
+    {% set scriptTagOptions = {
+        'depends': [
+            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
+        ],
+    } %}
+    {% if showWelcome %}
+        {{ craft.translationsuite.register('/src/js/welcome.ts', false, scriptTagOptions) }}
+    {% endif %}
+{% endblock %}
+
+{# The content of the CP Section#}
+{% set content %}
+    {% if showWelcome %}
+        <div id="app-container"></div>
+        <div class="readable text-center mx-auto">
+            <img
+                    src="{{ baseAssetsUrl ~ '/img/Translationsuite-icon.svg' }}"
+                    alt="Translation suitelogo"
+                    class="w-1/5 h-auto"
+                    width="20%"
+            >
+            <h2>Thanks for choosing Translation Suite</h2>
+            <div class="w-1/2 mx-auto">
+                <p>Translation Suite facilitates the process of translating static content in development with the possibility to manage the translations through the Craft control panel.</p>
+                <p>For more information, please <a href="{{ docsUrl }}" target="_blank" rel="noopener">see the documentation</a></p>
+                <a href="{{ pluginUrl }}" class="a-button--primary mt-8 mb-12">Go to the dashboard</a>
+            </div>
+        </div>
+    {% else %}
+        <h2>Normal content goes here</h2>
+        <p class="textline">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi aperiam aspernatur commodi consectetur deleniti dolorum est molestiae nostrum quaerat voluptatum. Blanditiis deleniti facilis fugit id ipsum laudantium, natus quaerat voluptates?</p>
+    {% endif %}
+{% endset %}

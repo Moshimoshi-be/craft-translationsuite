@@ -1,0 +1,25 @@
+.a-button {
+    display: inline-block;
+    padding: 1em 2em;
+    text-decoration: none;
+    transition: background-color 250ms ease-in-out;
+    background-color: var(--button-bg);
+    color: var(--button-color);
+    @apply rounded;
+
+    &:hover {
+        text-decoration: none;
+        background-color: var(--button-bg-highlight);
+    }
+}
+
+.a-button--primary {
+    @extend .a-button;
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-color);
+
+    &:hover {
+        background-color: var(--button-primary-bg-highlight);
+    }
+
+}

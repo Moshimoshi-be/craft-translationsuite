@@ -1,0 +1,24 @@
+{% extends "translationsuite/_layouts/translationsuite_cp.twig" %}
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset") %}
+
+{# Basepath for assets #}
+{% set baseAssetsUrl = view.getAssetManager().getPublishedUrl('@moshimoshi/translationsuite/web/assets/dist', true) %}
+
+{# Page specific scripts #}
+{% block head %}
+    {{ parent() }}
+    {% set scriptTagOptions = {
+        'depends': [
+            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
+        ],
+    } %}
+{#    {{ craft.translationsuite.register('/src/js/welcome.ts', false, scriptTagOptions) }}#}
+{% endblock %}
+
+{# The content of the CP Section#}
+{% set content %}
+    <h1>{{ "The only plugin to manage translations you'll ever need"|t('translationsuite') }}</h1>
+    <p class="textline">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi aperiam aspernatur commodi consectetur deleniti dolorum est molestiae nostrum quaerat voluptatum. Blanditiis deleniti facilis fugit id ipsum laudantium, natus quaerat voluptates?</p>
+{% endset %}

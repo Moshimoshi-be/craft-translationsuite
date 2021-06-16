@@ -1,0 +1,11 @@
+{% extends "_layouts/cp" %}
+
+{% block head %}
+    {{ parent() }}
+    {% set scriptTagOptions = {
+        'depends': [
+            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
+        ],
+    } %}
+    {{ craft.translationsuite.register('/src/js/app.ts', false, scriptTagOptions) }}
+{% endblock %}

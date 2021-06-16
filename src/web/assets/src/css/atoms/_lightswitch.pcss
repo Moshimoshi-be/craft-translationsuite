@@ -1,4 +1,8 @@
 .a-lightswitch {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
     border: 1px solid var(--lightswitch-border);
     @apply rounded;
 
@@ -8,6 +12,7 @@
 
     &__description {
         font-size: .775rem;
+        height: 100%;
         background-color: var(--lightswitch-description-background);
         padding: 6px 9px;
     }

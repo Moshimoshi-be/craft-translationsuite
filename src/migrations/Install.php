@@ -10,10 +10,9 @@
 
 namespace moshimoshi\translationsuite\migrations;
 
-use moshimoshi\translationsuite\Translationsuite;
+use moshimoshi\translationsuite\services\TranslationsService;
 
 use Craft;
-use craft\config\DbConfig;
 use craft\db\Migration;
 
 /**
@@ -59,9 +58,9 @@ class Install extends Migration
         if ($this->createTables()) {
             $this->createIndexes();
             $this->addForeignKeys();
+
             // Refresh the db schema caches
             Craft::$app->db->schema->refresh();
-            $this->insertDefaultData();
         }
 
         return true;
@@ -93,26 +92,50 @@ class Install extends Migration
      *
      * @return bool
      */
-    protected function createTables()
+    protected function createTables(): bool
     {
         $tablesCreated = false;
 
-    // translationsuite_translationsuiterecord table
-        $tableSchema = Craft::$app->db->schema->getTableSchema('{{%translationsuite_translationsuiterecord}}');
+        // Source table
+        $tableSchema = Craft::$app->db->schema->getTableSchema(TranslationsService::$sourceMessageTable);
         if ($tableSchema === null) {
             $tablesCreated = true;
             $this->createTable(
-                '{{%translationsuite_translationsuiterecord}}',
+                TranslationsService::$sourceMessageTable,
                 [
+                    // Craft required columns
                     'id' => $this->primaryKey(),
                     'dateCreated' => $this->dateTime()->notNull(),
                     'dateUpdated' => $this->dateTime()->notNull(),
                     'uid' => $this->uid(),
-                // Custom columns in the table
-                    'siteId' => $this->integer()->notNull(),
-                    'some_field' => $this->string(255)->notNull()->defaultValue(''),
+
+                    // Grabbed this from the Yii Migrations (@yii/i18n/migrations/)
+                    'category' => $this->string(),
+                    'message' => $this->text(),
                 ]
             );
+        }
+
+        $tableSchema = Craft::$app->db->schema->getTableSchema(TranslationsService::$messageTable);
+        if ($tableSchema === null) {
+            $tablesCreated = true;
+            $this->createTable(
+                TranslationsService::$messageTable,
+                [
+                    // Craft required columns
+                    'id' => $this->integer()->notNull(),
+                    'dateCreated' => $this->dateTime()->notNull(),
+                    'dateUpdated' => $this->dateTime()->notNull(),
+                    'uid' => $this->uid(),
+
+                    // Grabbed this from the Yii Migrations (@yii/i18n/migrations/)
+                    'language' => $this->string(16)->notNull(),
+                    'translation' => $this->text()
+                ]
+            );
+
+            // Grabbed this from the Yii Migrations (@yii/i18n/migrations/)
+            $this->addPrimaryKey('pk_message_id_language', TranslationsService::$messageTable, ['id', 'language']);
         }
 
         return $tablesCreated;
@@ -125,24 +148,8 @@ class Install extends Migration
      */
     protected function createIndexes()
     {
-    // translationsuite_translationsuiterecord table
-        $this->createIndex(
-            $this->db->getIndexName(
-                '{{%translationsuite_translationsuiterecord}}',
-                'some_field',
-                true
-            ),
-            '{{%translationsuite_translationsuiterecord}}',
-            'some_field',
-            true
-        );
-        // Additional commands depending on the db driver
-        switch ($this->driver) {
-            case DbConfig::DRIVER_MYSQL:
-                break;
-            case DbConfig::DRIVER_PGSQL:
-                break;
-        }
+        $this->createIndex('idx_message_language', TranslationsService::$messageTable, 'language');
+        $this->createIndex('idx_source_message_category', TranslationsService::$sourceMessageTable, 'category');
     }
 
     /**
@@ -152,25 +159,15 @@ class Install extends Migration
      */
     protected function addForeignKeys()
     {
-    // translationsuite_translationsuiterecord table
         $this->addForeignKey(
-            $this->db->getForeignKeyName('{{%translationsuite_translationsuiterecord}}', 'siteId'),
-            '{{%translationsuite_translationsuiterecord}}',
-            'siteId',
-            '{{%sites}}',
+            'fk_message_source_message',
+            TranslationsService::$messageTable,
+            'id',
+            TranslationsService::$sourceMessageTable,
             'id',
             'CASCADE',
-            'CASCADE'
+            'RESTRICT'
         );
-    }
-
-    /**
-     * Populates the DB with the default data.
-     *
-     * @return void
-     */
-    protected function insertDefaultData()
-    {
     }
 
     /**
@@ -180,7 +177,7 @@ class Install extends Migration
      */
     protected function removeTables()
     {
-    // translationsuite_translationsuiterecord table
-        $this->dropTableIfExists('{{%translationsuite_translationsuiterecord}}');
+        // Let's not delete the tables on an uninstall, for safety purposes.
+        // Wouldn't want to lose our translations on an accidental uninstall.
     }
 }

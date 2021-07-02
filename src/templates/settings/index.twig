@@ -20,44 +20,105 @@
 
     {{ redirectInput("translationsuite/settings") }}
     {% namespace 'settings' %}
-        <div class="a-field-container">
-            <div class="w-2/3">
-                {{ forms.textField({
-                    label: 'Plugin name',
-                    id: 'pluginName',
-                    name: 'pluginName',
-                    value: settings['pluginName']
-                }) }}
+        <div class="c-field-container">
+            <div class="w-full md:w-2/3">
+                di
             </div>
         </div>
 
-        <div class="a-field-container">
-            <div class="w-2/3">
+        <div class="c-field-container">
+            <div class="w-full md:w-2/3">
                 <div class="a-lightswitch">
                     <div class="a-lightswitch__field">
                         {{ forms.lightswitch({
-                            label: 'Use Translation files?',
+                            label: 'Use Translation Files?',
                             id: 'useTranslationFiles',
                             name: 'useTranslationFiles',
                             on: settings['useTranslationFiles'],
-                            instructions: 'test'
                         }) }}
                     </div>
                     <div id="useTranslationFiles-desc" class="a-lightswitch__description">
-                        Enabling this option will fetch translations from the translations directory, translations in this
-                        file can then be overwritten with the UI.
+                        Enabling this option will also fetch translations from the translation files.
                     </div>
                 </div>
             </div>
-            <div class="w-1/3">
-                <div class="a-field-container__info">
-                    {% include 'translationsuite/_includes/icons/information-circle.twig' %}
-                    Translation Suite will fetch the translations from the "translations" directory in the root of the project.
-                </div>
-            </div>
-
         </div>
 
+        <div class="c-field-container">
+            <div class="w-full md:w-2/3">
+                <div class="a-lightswitch">
+                    <div class="a-lightswitch__field">
+                        {{ forms.lightswitch({
+                            label: 'Force Translations?',
+                            id: 'forceTranslations',
+                            name: 'forceTranslations',
+                            on: settings['forceTranslations'],
+                        }) }}
+                    </div>
+                    <div id="forceTranslations-desc" class="a-lightswitch__description">
+                        Enabling this option will always translate your message, even when the language is the same.<br>
+                        You want to enable this when you're using messages like "error.small" instead of messages like
+                        "This value is too small".<br>
+                        If you're unsure, enabling this is the safest option.
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="c-field-container">
+            <div class="w-full md:w-2/3">
+                <div class="a-lightswitch">
+                    <div class="a-lightswitch__field">
+                        {{ forms.lightswitch({
+                            label: 'Enable Caching?',
+                            id: 'enableCaching',
+                            name: 'enableCaching',
+                            on: settings['enableCaching'],
+                        }) }}
+                    </div>
+                    <div id="enableCaching-desc" class="a-lightswitch__description">
+                        Turning this on will cache your translations, you probably want to enable this in production.<br>
+                        Adding or changing translations will automatically clear the cache.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-nowrap items-stretch">
+            <div class="c-fields-group col-3 w-full md:w-2/3">
+                <div class="c-fields-group__container">
+                    <h4>Translation categories:</h4>
+                    <div class="c-fields-group__col-3">
+                        {% for category, enabled in settings['translationCategories'] %}
+                            <div class="c-field-container">
+                                <div class="a-checkbox">
+                                    {{ forms.checkbox({
+                                        label: category|ucfirst,
+                                        id: 'translationCategories[' ~ category ~ ']',
+                                        name: 'translationCategories[' ~ category ~ ']',
+                                        checked: enabled
+                                    }) }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div id="translationCategories-desc" class="c-fields-group__description">
+                    Enable the categories you'd like to manage using the UI.
+                </div>
+            </div>
+            <div class="w-full md:w-1/3">
+                {% embed 'translationsuite/_includes/infobox/infobox.twig' with {icon:'warning', classes: 'md:ml-4 md:mt-0'} %}
+                    {% block content %}
+                        <ol>
+                            <li>If you're missing categories, try clearing the cache.</li>
+                            <li>Make sure to only select the categories you want to manage, some categories might contain a lot of translations and will fill up your database.</li>
+                            <li>If you are still missing categories after clearing the cache, make sure you've added your translations as described in the <a href="https://craftcms.com/docs/3.x/sites.html#provide-the-translations" target="_blank" rel="noopener">Craft CMS Documentation</a></li>
+                            <p>Every file added in the translations folder will be registered as a category</p>
+                        </ol>
+                    {% endblock %}
+                {% endembed %}
+            </div>
+        </div>
     {% endnamespace %}
 {% endblock %}

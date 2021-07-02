@@ -1,0 +1,32 @@
+.a-translation-field {
+    position: relative;
+    width: 100%;
+
+    textarea {
+        width: 100%;
+        min-height: 35px;
+    }
+
+    label {
+        position: absolute;
+        top: 0;
+        right: 0;
+        line-height: .475rem;
+        font-size: .475rem;
+        text-transform: uppercase;
+        background: var(--field-translation-field-label-bg);
+        padding: .4em .3em .3em .3em;
+        border-top-right-radius: 3px;
+        border-bottom-left-radius: 3px;
+        pointer-events: none;
+
+        &.type-db {
+            background: #1abc9c;
+            color: white;
+        }
+        &.type-missing {
+            background: var(--field-translation-field-label-missing-bg);
+            color: white;
+        }
+    }
+}

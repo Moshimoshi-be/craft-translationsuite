@@ -1,0 +1,6 @@
+{% set icon = icon is defined ? icon : 'information-circle' %}
+{% set classes = classes is defined ? classes : '' %}
+<div class="a-infobox {{ classes }}">
+    {% include 'translationsuite/_includes/icons/' ~ icon ~ '.twig' %}
+    {% block content %}{% endblock %}
+</div>

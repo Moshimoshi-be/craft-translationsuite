@@ -7,6 +7,7 @@
 
 :root {
     --color-japanese-red: #BC002D;
+    --color-green: #1abc9c;
     --color-black: #222;
     --color-lighterBlack: #333;
     --color-white: #FFF;
@@ -30,4 +31,15 @@
 
     --field-container-notice-border: var(--color-craft-borders);
     --field-container-notice-background: var(--color-craft-lighterBorders);
+
+    --field-translation-field-label-bg: var(--color-craft-borders);
+    --field-translation-field-label-missing-bg: var(--color-japanese-red);
+    --field-translation-field-label-db-bg: var(--color-green);
 }
+
+/** Beakpoints **/
+@custom-media --2xl (width >= 96em);
+@custom-media --xl (width >= 80em);
+@custom-media --lg (width >= 64em);
+@custom-media --md (width >= 48em);
+@custom-media --sm (width >= 40em);

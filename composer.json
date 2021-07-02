@@ -38,7 +38,7 @@
         "documentationUrl": "https://github.com/moshimoshi-be/translationsuite/blob/master/README.md",
         "changelogUrl": "https://raw.githubusercontent.com/moshimoshi-be/translationsuite/master/CHANGELOG.md",
         "components": {
-            "translationsuiteService": "moshimoshi\\translationsuite\\services\\TranslationsuiteService"
+            "translationsuiteService": "CategoriesService"
         },
         "class": "moshimoshi\\translationsuite\\Translationsuite"
     }

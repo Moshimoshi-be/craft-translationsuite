@@ -36,6 +36,8 @@ export default ({ command }) => ({
   resolve: {
     alias: {
       '@': '/src',
+      'axios': '/node_modules/axios/index.d.ts',
+      'vue': '/node_modules/vue/dist/vue.esm-browser.js'
     },
   },
   server: {

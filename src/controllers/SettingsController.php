@@ -8,6 +8,8 @@ namespace moshimoshi\translationsuite\controllers;
 use Craft;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use moshimoshi\translationsuite\helpers\CpHelper;
+use moshimoshi\translationsuite\services\CategoriesService;
 use moshimoshi\translationsuite\Translationsuite;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -15,9 +17,9 @@ use yii\web\Response;
 /**
  * SettingsController
  *
- * @copyright   2021 UniWeb bvba
- * @since       2021-06-15 16:50
- * @author      pieterjangeeroms
+ * @author    Moshi Moshi
+ * @package   Translationsuite
+ * @since     1.0.0
  */
 class SettingsController extends Controller
 {
@@ -33,7 +35,9 @@ class SettingsController extends Controller
     public function actionDashboard(bool $showWelcome = false): Response
     {
         $this->requirePermission('translationsuite:dashboard');
-        $variables = $this->setCommonVariables();
+        $segments = $this->request->segments;
+        $variables = CpHelper::setCommonVariables($segments);
+        //$variables = $this->setCommonVariables();
         $variables['showWelcome'] = $showWelcome;
 
 
@@ -49,7 +53,8 @@ class SettingsController extends Controller
     public function actionExport(): Response
     {
         $this->requirePermission('translationsuite:export');
-        $variables = $this->setCommonVariables();
+        $segments = $this->request->segments;
+        $variables = CpHelper::setCommonVariables($segments);
 
         return $this->renderTemplate('translationsuite/export/index', $variables);
     }
@@ -57,7 +62,8 @@ class SettingsController extends Controller
     public function actionSettings(): Response
     {
         $this->requirePermission('translationsuite:settings');
-        $variables = $this->setCommonVariables();
+        $segments = $this->request->segments;
+        $variables = CpHelper::setCommonVariables($segments);
         $variables['fullPageForm'] = true;
         $variables['settings'] = Translationsuite::$settings;
 
@@ -69,6 +75,7 @@ class SettingsController extends Controller
         $this->requirePermission('translationsuite:settings');
         $this->requirePostRequest();
 
+        // Save the settings
         $pluginHandle = Craft::$app->getRequest()->getRequiredBodyParam('pluginHandle');
         $settings = Craft::$app->getRequest()->getBodyParam('settings', []);
         $plugin = Craft::$app->getPlugins()->getPlugin($pluginHandle);
@@ -93,55 +100,5 @@ class SettingsController extends Controller
         return $this->redirectToPostedUrl();
     }
 
-    // Protected Methods
-    // =================================================================================================================
-
-    protected function setCommonVariables(): array
-    {
-        // Find out the method that's calling the function
-        $caller = debug_backtrace()[1]['function'];
-        $caller = explode('action', $caller);
-        $caller = end($caller);
-
-        $pluginName = Translationsuite::$plugin->name;
-        $title = Craft::t('translationsuite', $caller);
-
-        $variables = [];
-        $variables['pluginName'] = $pluginName;
-        $variables['docTitle'] = "{$pluginName} - {$title}";
-        $variables['fullPageForm'] = false;
-        $variables['docsUrl'] = self::DOCUMENTATION_URL;
-        $variables['title'] = $title;
-        $variables['selectedSubnavItem'] = strtolower($caller);
-        $variables['crumbs'] = [];
-        $variables['pluginUrl'] = UrlHelper::cpUrl('translationsuite');
-
-        // Generate the crumbs
-        $segments = $this->request->segments;
-        foreach ($segments as $k => $segment) {
-            $label = Craft::t('translationsuite', ucfirst($segment));
-            $url = '';
-            for ($i = 1; $i <= $k; $i++) {
-                $url .= $segments[$i] . "/";
-            }
-
-            if ($k == 0) {
-                $label = $pluginName;
-                $url = $segment;
-            }
-
-            $variables['crumbs'][] = [
-                'label' => $label,
-                'url'   => $url,
-            ];
-        }
-
-        $variables['baseAssetsUrl'] = Craft::$app->assetManager->getPublishedUrl(
-            '@moshimoshi/translationsuite/web/assets/dist',
-            true
-        );
-
-        return $variables;
-    }
 
 }

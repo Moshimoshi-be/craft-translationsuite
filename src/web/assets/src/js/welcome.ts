@@ -6,7 +6,8 @@ const main = async () => {
     // Create our vue instance
     const app = createApp(App);
     // Mount the app
-    const root = app.mount('#app-container');
+    const root = app.mount('#app-welcome');
+
 
     return root;
 };

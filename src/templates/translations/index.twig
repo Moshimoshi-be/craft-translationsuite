@@ -1,0 +1,33 @@
+{% extends "translationsuite/_layouts/translationsuite_cp.twig" %}
+{% do view.registerAssetBundle("moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset") %}
+
+{# Page specific scripts #}
+{% block head %}
+    {{ parent() }}
+    <script>
+
+    </script>
+    {% set scriptTagOptions = {
+        'depends': [
+            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
+        ],
+    } %}
+    {{ craft.translationsuite.register('/src/js/translationmanager.ts', false, scriptTagOptions) }}
+{% endblock %}
+
+{% block toolbar %}
+    <toolbar></toolbar>
+{% endblock %}
+
+{% block sidebar %}
+    <sidebar></sidebar>
+{% endblock %}
+
+{# The content of the CP Section#}
+{% set content %}
+    <manager></manager>
+{% endset %}
+
+{% set footer %}
+    <pagination></pagination>
+{% endset %}

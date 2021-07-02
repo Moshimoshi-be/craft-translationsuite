@@ -10,12 +10,15 @@
 
 namespace moshimoshi\translationsuite;
 
+use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\i18n\I18N;
 use craft\services\UserPermissions;
-use moshimoshi\translationsuite\services\MessageSource;
-use moshimoshi\translationsuite\services\TranslationsuiteService;
+use craft\utilities\ClearCaches;
+use moshimoshi\translationsuite\assetbundles\translationsuite\TranslationsuiteAsset;
+use moshimoshi\translationsuite\services\TranslationsService;
+use moshimoshi\translationsuite\services\CategoriesService;
 use moshimoshi\translationsuite\variables\TranslationsuiteVariable;
 use moshimoshi\translationsuite\models\Settings;
 
@@ -29,7 +32,9 @@ use craft\web\twig\variables\CraftVariable;
 use craft\events\RegisterUrlRulesEvent;
 
 use nystudio107\pluginvite\services\VitePluginService;
+
 use yii\base\Event;
+use yii\web\Response;
 
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
@@ -45,7 +50,8 @@ use yii\base\Event;
  * @package   Translationsuite
  * @since     1.0.0
  *
- * @property  TranslationsuiteService $translationsuiteService
+ * @property  CategoriesService $categories
+ * @property  TranslationsService $translations
  * @property  VitePluginService $vite
  * @method    Settings getSettings()
  */
@@ -104,11 +110,11 @@ class Translationsuite extends Plugin
     {
         $config['components'] = [
             'translationsuite' => __CLASS__,
-            'messageSource' => MessageSource::class,
+            'categories' => CategoriesService::class,
             // Register the vite service
             'vite' => [
                 'class' => VitePluginService::class,
-                'assetClass' => TranscoderAsset::class,
+                'assetClass' => TranslationsuiteAsset::class,
                 'useDevServer' => true,
                 'devServerPublic' => 'http://localhost:3001',
                 'serverPublic' => 'http://localhost:8000',
@@ -151,21 +157,23 @@ class Translationsuite extends Plugin
         self::$devMode = Craft::$app->getConfig()->getGeneral()->devMode;
 
         $this->name = self::$settings->pluginName;
-        $this->attachEventListeners();
 
-        // Register our variables
-        Event::on(
-            CraftVariable::class,
-            CraftVariable::EVENT_INIT,
-            function (Event $event) {
-                /** @var CraftVariable $variable */
-                $variable = $event->sender;
-                $variable->set('translationsuite', [
-                    'class' => TranslationsuiteVariable::class,
-                    'viteService' => $this->vite
-                ]);
-            }
-        );
+        // Configuring Component here since we need the settings to initialize.
+        // We later pass this to the I18n component for the categories we manage.
+        $this->setComponents([
+            'translations' => [
+                'class' => TranslationsService::class,
+                'allowOverrides' => true,
+                'forceTranslation' => self::$settings->forceTranslations,
+                'useTranslationFiles' => self::$settings->useTranslationFiles,
+                'enableCaching' => self::$settings->enableCaching,
+            ]
+        ]);
+
+        $this->attachEventListeners();
+        $this->setTranslationProvider();
+
+
 
         // We're loaded
         Craft::info(
@@ -188,6 +196,13 @@ class Translationsuite extends Plugin
             $subNavs['dashboard'] = [
                 'label' => Craft::t('translationsuite', 'Dashboard'),
                 'url' => 'translationsuite/dashboard'
+            ];
+        }
+
+        if ($currentUser->can('translationsuite:translations')) {
+            $subNavs['translations'] = [
+                'label' => Craft::t('translationsuite', 'Translations'),
+                'url' => 'translationsuite/translations'
             ];
         }
 
@@ -217,6 +232,11 @@ class Translationsuite extends Plugin
         return $navItem;
     }
 
+    public function getSettingsResponse(): Response
+    {
+        return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('translationsuite/settings'));
+    }
+
     // Protected Methods
     // =========================================================================
 
@@ -230,11 +250,6 @@ class Translationsuite extends Plugin
         return new Settings();
     }
 
-    public function getSettingsResponse()
-    {
-        Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('translationsuite/settings'));
-    }
-
     protected function attachEventListeners() {
         $request = Craft::$app->getRequest();
 
@@ -242,13 +257,16 @@ class Translationsuite extends Plugin
             $this->attachCpEventListeners();
         }
 
-        // Do something after we're installed
+        // Handler: EVENT_AFTER_INSTALL_PLUGIN
         Event::on(
             Plugins::class,
             Plugins::EVENT_AFTER_INSTALL_PLUGIN,
             function (PluginEvent $event) {
                 if ($event->plugin === $this) {
-                    // We were just installed
+                    // Fetch the translation categories and add them to the settings.
+                    CategoriesService::instance()->setTranslationsCategoriesSettings();
+
+                    // Redirect the user to the Dashboard
                     $request = Craft::$app->getRequest();
                     if ($request->isCpRequest) {
                         Craft::$app->getResponse()->redirect(UrlHelper::cpUrl(
@@ -259,6 +277,46 @@ class Translationsuite extends Plugin
                         ))->send();
                     }
                 }
+            }
+        );
+
+        // Handle: Register cache options
+        Event::on(
+            ClearCaches::class,
+            ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
+            function (RegisterCacheOptionsEvent $event) {
+                Craft::debug(
+                    'ClearCaches::EVENT_REGISTER_CACHE_OPTIONS',
+                    __METHOD__
+                );
+
+                $event->options = array_merge(
+                    $event->options,
+                    $this->registerCacheOptions()
+                );
+            }
+        );
+
+        // Register our variables
+        Event::on(
+            CraftVariable::class,
+            CraftVariable::EVENT_INIT,
+            function (Event $event) {
+                /** @var CraftVariable $variable */
+                $variable = $event->sender;
+
+                $variable->set('translationsuite', [
+                    'class' => TranslationsuiteVariable::class,
+                    'viteService' => $this->vite
+                ]);
+            }
+        );
+
+        Event::on(
+            TranslationsService::class,
+            TranslationsService::EVENT_MISSING_TRANSLATION,
+            function(Event $event) {
+                // Do something when a translation is not found
             }
         );
     }
@@ -297,9 +355,20 @@ class Translationsuite extends Plugin
         return [
             'translationsuite' => 'translationsuite/settings/dashboard',
             'translationsuite/dashboard' => 'translationsuite/settings/dashboard',
+
+            'translationsuite/translations' => 'translationsuite/translations',
+            'translationsuite/translations/get-languages' => 'translationsuite/translations/get-languages',
+            'translationsuite/translations/get-categories' => 'translationsuite/translations/get-categories',
+            'translationsuite/translations/get-missing-translations' => 'translationsuite/translations/get-missing-translations',
+            'translationsuite/translations/get-translations/<category>' => 'translationsuite/translations/get-translations',
+            'translationsuite/translations/add-source' => 'translationsuite/translations/add-source',
+            'translationsuite/translations/update-translations' => 'translationsuite/translations/update-translations',
+            'translationsuite/translations/delete-translations' => 'translationsuite/translations/delete-translations',
+
             'translationsuite/export' => 'translationsuite/settings/export',
             'translationsuite/settings' => 'translationsuite/settings/settings',
             'translationsuite/settings/save-settings' => 'translationsuite/settings/save-settings',
+            'translationsuite/settings/refresh-translation-categories' => 'translationsuite/settings/refresh-translation-categories',
         ];
     }
 
@@ -309,6 +378,9 @@ class Translationsuite extends Plugin
             'translationsuite:dashboard' => [
                 'label' => Craft::t('translationsuite', 'Dashboard'),
             ],
+            'translationsuite:translations' => [
+                'label' => Craft::t('translationsuite', 'Translations')
+            ],
             'translationsuite:export' => [
                 'label' => Craft::t('translationsuite', 'Export translations'),
             ],
@@ -316,5 +388,40 @@ class Translationsuite extends Plugin
                 'label' => Craft::t('translationsuite', 'Access settings'),
             ]
         ];
+    }
+
+    protected function registerCacheOptions(): array
+    {
+        return [
+            [
+                'key'    => 'translationsuite-translationcategories-caches',
+                'label'  => Craft::t('translationsuite', 'Translation Suite: Translation categories'),
+                'action' => [self::$plugin->categories, 'invalidateCategoryCaches']
+            ],
+            [
+                'key' => 'translationsuite-translations-caches',
+                'label' => Craft::t('translationsuite', 'Translation Suite: Translations'),
+                'action' => [self::$plugin->translations, 'invalidateTranslationsCaches']
+            ]
+        ];
+    }
+
+    protected function setTranslationProvider(): bool
+    {
+        /** @var I18N $i18n */
+        $i18n = Craft::$app->getComponents(false)['i18n'];
+        $categories = array_filter(self::$settings->translationCategories, function($enabled) {
+            return $enabled;
+        });
+
+        foreach ($categories as $category => $enabled) {
+            $i18n->translations[$category] = self::$plugin->translations;
+        }
+
+        Craft::$app->setComponents([
+            'i18n' => $i18n
+        ]);
+
+        return true;
     }
 }

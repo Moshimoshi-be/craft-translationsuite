@@ -1,23 +1,15 @@
 <?php
-/**
- * Translationsuite plugin for Craft CMS 3.x
- *
- * The one and only translation plugin you'll ever need.
- *
- * @link      moshimoshi.be
- * @copyright Copyright (c) 2021 Moshi Moshi
- */
 
 namespace moshimoshi\translationsuite\variables;
 
+use craft\helpers\Template;
 use nystudio107\pluginvite\variables\ViteVariableInterface;
 use nystudio107\pluginvite\variables\ViteVariableTrait;
+use Twig\Markup;
+use yii\di\ServiceLocator;
 
 /**
  * Translationsuite Variable
- *
- * Craft allows plugins to provide their own template variables, accessible from
- * the {{ craft }} global variable (e.g. {{ craft.translationsuite }}).
  *
  * https://craftcms.com/docs/plugins/variables
  *
@@ -28,4 +20,20 @@ use nystudio107\pluginvite\variables\ViteVariableTrait;
 class TranslationsuiteVariable implements ViteVariableInterface
 {
     use ViteVariableTrait;
+
+
+    /**
+     * Injects translations in a namespace in the Window object.
+     * @param string $category
+     * @param string|null $locale
+     * @return Markup
+     */
+    public function injectTranslations(string $category, string $locale = null): Markup
+    {
+        if (!$locale) {
+            $locale = \Craft::$app->locale;
+        }
+
+        return Template::raw('<script>alert("Hello there")</script>');
+    }
 }

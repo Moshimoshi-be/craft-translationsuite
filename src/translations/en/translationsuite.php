@@ -23,4 +23,5 @@
 return [
     'Translationsuite plugin loaded' => 'Translationsuite plugin loaded',
     'translationsuite' => 'Translation Suite',
+    'translate this' => "Its translated"
 ];

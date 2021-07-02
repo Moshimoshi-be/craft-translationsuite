@@ -18,13 +18,6 @@ use craft\base\Model;
 /**
  * Translationsuite Settings Model
  *
- * This is a model used to define the plugin's settings.
- *
- * Models are containers for data. Just about every time information is passed
- * between services, controllers, and templates in Craft, it’s passed via a model.
- *
- * https://craftcms.com/docs/plugins/models
- *
  * @author    Moshi Moshi
  * @package   Translationsuite
  * @since     1.0.0
@@ -44,16 +37,26 @@ class Settings extends Model
      */
     public $useTranslationFiles = true;
 
+    /**
+     * @var array
+     */
+    public $translationCategories = [];
+
+    /**
+     * @var bool
+     */
+    public $forceTranslations = true;
+
+    /**
+     * @var bool
+     */
+    public $enableCaching = true;
+
     // Public Methods
     // =========================================================================
 
     /**
      * Returns the validation rules for attributes.
-     *
-     * Validation rules are used by [[validate()]] to check if attribute values are valid.
-     * Child classes may override this method to declare different validation rules.
-     *
-     * More info: http://www.yiiframework.com/doc-2.0/guide-input-validation.html
      *
      * @return array
      */
@@ -61,7 +64,10 @@ class Settings extends Model
     {
         return [
             ['pluginName', 'string'],
-            ['useTranslationFiles', 'boolean']
+            ['pluginName', 'required'],
+            ['useTranslationFiles', 'boolean'],
+            ['forceTranslations', 'boolean'],
+            ['enableCaching', 'boolean']
         ];
     }
 }

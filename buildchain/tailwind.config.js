@@ -19,6 +19,18 @@ module.exports = {
     }
   },
   theme: {
+    screens: {
+      'sm': '40em',
+      'md': '48em',
+      'lg': '64em',
+      'xl': '80em',
+    },
+    minWidth: {
+      '0': '0',
+      '48': '12em',
+      '64': '16em',
+      'full': '100%',
+    }
   },
   corePlugins: {},
   plugins: [],

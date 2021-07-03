@@ -110,11 +110,23 @@ class TranslationsController extends Controller
                 $dbTranslation = MessageRecord::find()
                     ->from(['m' => MessageRecord::tableName()])
                     ->leftJoin(['t' => SourceMessageRecord::tableName()], 't.id = m.id')
-                    ->where(['language' => $locale])
+                    ->where([
+                        't.category' => $translation['category'],
+                        't.message' => $translation['message'],
+                        'm.language' => $locale
+                    ])
                     ->one();
 
-                $dbTranslation->translation = $translated['db'];
+                if (!$dbTranslation) {
+                    $source = new SourceMessageRecord([
+                        'category' => $translation['category'],
+                        'message' => $translation['message'],
+                    ]);
+                    $source->save();
 
+                    $dbTranslation = MessageRecord::findOne(['id' => $source->id]);
+                }
+                $dbTranslation->translation = $translated['db'] ?? '';
                 $dbTranslation->save();
             }
         }

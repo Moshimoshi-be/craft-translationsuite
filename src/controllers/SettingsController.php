@@ -65,6 +65,9 @@ class SettingsController extends Controller
         $segments = $this->request->segments;
         $variables = CpHelper::setCommonVariables($segments);
         $variables['fullPageForm'] = true;
+
+        // Update the possible categories
+        Translationsuite::$plugin->categories->setTranslationsCategoriesSettings();
         $variables['settings'] = Translationsuite::$settings;
 
         return $this->renderTemplate('translationsuite/settings/index', $variables);

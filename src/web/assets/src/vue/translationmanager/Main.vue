@@ -13,7 +13,7 @@
         </div>
         <div class="flex flex-nowrap mb-16 w-full">
           <label for="message" class="inline-block mr-8 min-w-48">Message:</label>
-          <textarea name="message" type="text" rows="3" class="text w-full" v-model="message" />
+          <textarea name="message" type="text" rows="3" class="text w-full" v-model="message"/>
         </div>
         <div class="flex w-full justify-end mt-4">
           <input
@@ -22,7 +22,7 @@
               :class="{'disabled': isFormDisabled }"
               type="submit"
               class="btn submit px-6"
-              value="Add" />
+              value="Add"/>
         </div>
 
       </form>
@@ -45,7 +45,8 @@
           </thead>
 
           <tbody>
-          <tr v-for="(translation, index) in filteredTranslations" :key="selectedCategory == 'missing' ? 'missing' + '-' + index : translation.category + '-' + index">
+          <tr v-for="(translation, index) in filteredTranslations.slice(paginatorOffset, paginatorLimit)"
+              :key="selectedCategory == 'missing' ? 'missing' + '-' + index : translation.category + '-' + index">
             <td class="checkbox-cell">
               <div @click="selectOne(translation)" class="checkbox" :class="{'checked': translation.selected }"
                    title="Select" aria-label="Select"></div>
@@ -58,9 +59,13 @@
             </td>
             <td v-for="(language, key) in translation.languages" :key="translation.category + '-' + index + '-' + key">
               <div class="a-translation-field">
-                <textarea @keyup="markAsChanged(translation)" v-model="language.db" :name="'translation-' + index + '-' + key" rows="1" autocomplete="off" class="text w-full" :placeholder="language.file"></textarea>
+                <textarea @keyup="markAsChanged(translation)" v-model="language.db"
+                          :name="'translation-' + index + '-' + key" rows="1" autocomplete="off" class="text w-full"
+                          :placeholder="language.file"></textarea>
                 <label
-                    :class="language.db ? 'type-db' : language.file ? 'type-file' : 'type-missing'">{{ language.db ? 'db' : language.file ? 'file' : 'missing' }}</label>
+                    :class="language.db ? 'type-db' : language.file ? 'type-file' : 'type-missing'">{{
+                    language.db ? 'db' : language.file ? 'file' : 'missing'
+                  }}</label>
               </div>
             </td>
           </tr>
@@ -93,6 +98,8 @@ export default defineComponent({
       'languages',
       'selectedCategory',
       'categories',
+      'paginatorLimit',
+      'paginatorOffset'
     ])
   },
   methods: {

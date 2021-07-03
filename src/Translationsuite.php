@@ -312,6 +312,8 @@ class Translationsuite extends Plugin
             }
         );
 
+        // Gotta catch them all,
+        // if enabled in settings add all the missing translations (not in file or db) to the database.
         Event::on(
             TranslationsService::class,
             TranslationsService::EVENT_MISSING_TRANSLATION,
@@ -393,11 +395,6 @@ class Translationsuite extends Plugin
     protected function registerCacheOptions(): array
     {
         return [
-            [
-                'key'    => 'translationsuite-translationcategories-caches',
-                'label'  => Craft::t('translationsuite', 'Translation Suite: Translation categories'),
-                'action' => [self::$plugin->categories, 'invalidateCategoryCaches']
-            ],
             [
                 'key' => 'translationsuite-translations-caches',
                 'label' => Craft::t('translationsuite', 'Translation Suite: Translations'),

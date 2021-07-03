@@ -33,13 +33,6 @@ use yii\caching\TagDependency;
  */
 class CategoriesService extends Component
 {
-    // Constants
-    // =========================================================================
-
-    const TRANSLATIONSUITE_TRANSLATION_CATEGORIES_CACHE_TAG = 'translationsuite_translation_categories';
-    const EVENT_INVALIDATE_GENERAL_CACHES = 'invalidateGeneralCaches';
-
-
     // Public Methods
     // =========================================================================
 
@@ -87,26 +80,6 @@ class CategoriesService extends Component
         });
 
         return array_keys($enabledCategories);
-    }
-
-    public function invalidateCategoryCaches()
-    {
-        // Fetch translation categories based on files and add them to the possible categories.
-        $this->setTranslationsCategoriesSettings();
-        $cache = Craft::$app->getCache();
-        TagDependency::invalidate($cache, self::TRANSLATIONSUITE_TRANSLATION_CATEGORIES_CACHE_TAG);
-        Craft::info(
-            'Cleared general caches',
-            __METHOD__
-        );
-
-        $event = new InvalidateCachesEvent([
-           'component' => self::class,
-        ]);
-
-        if (!Craft::$app instanceof Application) {
-            $this->trigger(self::EVENT_INVALIDATE_GENERAL_CACHES, $event);
-        }
     }
 
     /**

@@ -15,7 +15,8 @@ const store = createStore({
             missingTranslations: [],
             translations: [],
             filteredTranslations: [],
-            paginatorLimit: 20,
+            paginatorLimit: 10,
+            paginatorStep: 10,
             paginatorOffset: 0,
             languages: [],
             filter: '',
@@ -87,6 +88,8 @@ const store = createStore({
             const refresh = value.refresh;
             const category = value.category;
             state.selectedCategory = category;
+            state.paginatorOffset = 0;
+            state.paginatorLimit = state.paginatorStep;
 
             // Reset stuff
             state.filter = '';
@@ -107,6 +110,22 @@ const store = createStore({
         },
         filterTranslations(state, filtered) {
             state.filteredTranslations = filtered;
+        },
+        nextPageOfTranslations(state) {
+            if (state.paginatorOffset + state.paginatorLimit > state.filteredTranslations.length) {
+                return false;
+            }
+            state.paginatorOffset += state.paginatorStep;
+            state.paginatorLimit = state.paginatorOffset + state.paginatorStep;
+            console.log("next page", state.paginatorOffset, state.paginatorLimit);
+        },
+        previousPageOfTranslations(state) {
+            if (state.paginatorOffset == 0) {
+                return false;
+            }
+            state.paginatorOffset -= state.paginatorStep;
+            state.paginatorLimit = state.paginatorOffset + state.paginatorStep;
+            console.log("prev page", state.paginatorOffset, state.paginatorLimit)
         },
         deleteSelectedTranslations(state) {
             const selectedTranslations = state.filteredTranslations.filter(translation => translation.selected == 1);
@@ -132,7 +151,9 @@ const store = createStore({
               translations: changedTranslations,
             };
             axios.post("/admin/translationsuite/translations/update-translations", data).then(response => {
-                console.log(response);
+                for (let translation of changedTranslations) {
+                    translation.changed = false;
+                }
             }).catch(error => {
                 console.error(error)
             });
@@ -178,6 +199,16 @@ const app = createApp(defineComponent({
                 store.commit('selectCategory', {category: 'missing'});
             } else {
                 store.commit('selectCategory', {category: store.state.categories[0], refresh: true});
+            }
+        });
+
+        document.addEventListener('keydown', ev => {
+            const cmdDown = ev.metaKey || ev.ctrlKey;
+            const saveKey = ev.key == "s"
+
+            if (cmdDown && saveKey) {
+                ev.preventDefault();
+                store.commit('updateChangedTranslations');
             }
         });
     }

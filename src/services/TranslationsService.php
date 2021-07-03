@@ -93,6 +93,9 @@ class TranslationsService extends PhpMessageSource
 
         if ($useDb) {
             $dbMessages = $this->checkSavedMessages($category, $language);
+            $dbMessages = array_filter($dbMessages, function($translation) {
+               return !empty($translation);
+            });
         }
 
         // Translations saved in the DB will overwrite translations found in the files.

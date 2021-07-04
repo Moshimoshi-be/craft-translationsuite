@@ -30,6 +30,11 @@ module.exports = {
       '48': '12em',
       '64': '16em',
       'full': '100%',
+    },
+    extend: {
+      maxWidth: {
+        '40': '10em',
+      }
     }
   },
   corePlugins: {},

@@ -240,13 +240,9 @@ class TranslationsService extends PhpMessageSource
         return $mainQuery->createCommand($this->db)->queryAll();
     }
 
-    public function getTranslations(string $category): array
+    public function getTranslations(string $category, bool $useFiles = true): array
     {
         $translations = [];
-
-        if ($this->enableCaching) {
-            $translations = $this->cache->get('');
-        }
 
         if (!$translations) {
             $categories = $this->getEnabledCategories();
@@ -267,34 +263,36 @@ class TranslationsService extends PhpMessageSource
                 ];
             }
 
-            foreach ($locales as $locale) {
-                // Mapping happens by broad locale
-                $generalizedLocale = substr($locale, 0, 2);
-                $messages = $this->loadMessages($category, $locale, false);
+            if ($useFiles && $this->useTranslationFiles) {
+                foreach ($locales as $locale) {
+                    // Mapping happens by broad locale
+                    $generalizedLocale = substr($locale, 0, 2);
+                    $messages = $this->loadMessages($category, $locale, false);
 
-                // Let's map it to the right format.
-                foreach ($messages as $message => $translation) {
+                    // Let's map it to the right format.
+                    foreach ($messages as $message => $translation) {
 
-                    // Hey! Something is already there!
-                    // Let's add some more stuff to it!
-                    if (isset($translations[$message])) {
-                        // Set both the locale and the translation
-                        // We set the locale here as well since it might be another language that was there for the message
-                        // In this case the locale wouldn't be set for the language we're adding.
-                        $translations[$message]['languages'][$generalizedLocale]['locale'] = $generalizedLocale;
+                        // Hey! Something is already there!
+                        // Let's add some more stuff to it!
+                        if (isset($translations[$message])) {
+                            // Set both the locale and the translation
+                            // We set the locale here as well since it might be another language that was there for the message
+                            // In this case the locale wouldn't be set for the language we're adding.
+                            $translations[$message]['languages'][$generalizedLocale]['locale'] = $generalizedLocale;
+                            $translations[$message]['languages'][$generalizedLocale]['file'] = $translation;
+
+                            continue; // Our work for this cycle is done, move ahead!
+                        }
+
+                        // Setup basic structure
+                        $translations[$message] = [
+                            'message' => $message,
+                            'category' => $category,
+                            'languages' => $availableLocales
+                        ];
+
                         $translations[$message]['languages'][$generalizedLocale]['file'] = $translation;
-
-                        continue; // Our work for this cycle is done, move ahead!
                     }
-
-                    // Setup basic structure
-                    $translations[$message] = [
-                        'message' => $message,
-                        'category' => $category,
-                        'languages' => $availableLocales
-                    ];
-
-                    $translations[$message]['languages'][$generalizedLocale]['file'] = $translation;
                 }
             }
 
@@ -308,11 +306,7 @@ class TranslationsService extends PhpMessageSource
                 $locale = $dbTranslation['language'];
 
                 // Hey! Something is already there!
-                // Let's add some more stuff to it!
                 if (isset($translations[$message])) {
-                    // Set both the locale and the translation
-                    // We set the locale here as well since it might be another language that was there for the message
-                    // In this case the locale wouldn't be set for the language we're adding.
                     $translations[$message]['languages'][$locale]['locale'] = $locale;
                     $translations[$message]['languages'][$locale]['db'] = $translation;
 
@@ -337,50 +331,97 @@ class TranslationsService extends PhpMessageSource
             }
         }
 
-        // Returning array as indexed instead of associative
-        // We do this to get a nice array instead of an object when returning Json.
-        return array_values($translations);
+        return $translations;
     }
 
-    public function getMissingTranslations(): array {
+    public function getAllTranslations(bool $useFiles): array
+    {
         $translations = [];
-
-        if($this->enableCaching) {
-            $translations = $this->cache->get(self::TRANSLATIONSUITE_MISSING_TRANSLATIONS_CACHE_TAG);
+        $categories = $this->getEnabledCategories();
+        foreach ($categories as $category) {
+            $translations[$category] = $this->getTranslations($category, $useFiles);
         }
 
-        if(!$translations) {
-            $missingTranslations =  $this->loadMissingMessages();
+        return $translations;
+    }
 
-            // This is later on used for the language generation.
-            $availableLocales = [];
-            $locales = Craft::$app->i18n->getSiteLocaleIds();
-            foreach ($locales as $locale) {
-                $short = substr($locale, 0, 2);
-                $availableLocales[$short] = [
-                    'locale' => $short,
-                ];
+    public function getMissingTranslations(bool $useFiles = true): array {
+        $translations = [];
+        $dbTranslations = [];
+
+        // $categories = $this->getEnabledCategories();
+        $locales = Craft::$app->i18n->getSiteLocaleIds();
+
+        $availableLocales = [];
+        foreach ($locales as $locale) {
+            $short = substr($locale, 0, 2);
+            $availableLocales[$short] = [
+                'locale' => $short,
+            ];
+        }
+
+        /*if ($useFiles && $this->useTranslationFiles) {
+            foreach ($categories as $category) {
+                foreach ($locales as $locale) {
+                    // Mapping happens by broad locale
+                    $generalizedLocale = substr($locale, 0, 2);
+                    $messages = $this->loadMessages($category, $locale, false);
+
+                    // Let's map it to the right format.
+                    foreach ($messages as $message => $translation) {
+
+                        // Hey! Something is already there!
+                        if (isset($translations[$message])) {
+                            $translations[$message]['languages'][$generalizedLocale]['locale'] = $generalizedLocale;
+                            $translations[$message]['languages'][$generalizedLocale]['file'] = $translation;
+
+                            continue; // Our work for this cycle is done, move ahead!
+                        }
+
+                        // Setup basic structure
+                        $translations[$message] = [
+                            'message' => $message,
+                            'category' => $category,
+                            'languages' => $availableLocales
+                        ];
+
+                        $translations[$message]['languages'][$generalizedLocale]['locale'] = $generalizedLocale;
+                        $translations[$message]['languages'][$generalizedLocale]['file'] = $translation;
+                    }
+                }
             }
+        }*/
 
-            foreach ($missingTranslations as $missingTranslation) {
+        // -------------------- DB -------------------------
+        if($this->enableCaching) {
+            $dbTranslations = $this->cache->get(self::TRANSLATIONSUITE_MISSING_TRANSLATIONS_CACHE_TAG);
+        }
+
+        if(!$dbTranslations) {
+            $dbTranslations =  $this->loadMissingMessages();
+
+            foreach ($dbTranslations as $missingTranslation) {
                 $message = $missingTranslation['message'];
                 $category = $missingTranslation['category'];
                 $locale = $missingTranslation['language'];
                 $translation = $missingTranslation['translation'];
 
-                if (!isset($translations[$message])) {
-                    $translations[$message] = [
-                        'selected'        => false,
-                        'message'   => $message,
-                        'category'  => $category,
-                        'languages' => $availableLocales,
-                    ];
+                if (isset($translations[$message])) {
+                    $translations[$message]['languages'][$locale]['locale'] = $locale;
+                    $translations[$message]['languages'][$locale]['db'] = $translation;
+
+                    continue;
                 }
 
-                $translations[$message]['languages'][$locale] = [
-                    'locale' => $locale,
-                    'db' => $translation
+                // Setup basic structure
+                $translations[$message] = [
+                    'message' => $message,
+                    'category' => $category,
+                    'languages' => $availableLocales
                 ];
+
+                $translations[$message]['languages'][$locale]['locale'] = $locale;
+                $translations[$message]['languages'][$locale]['db'] = $translation;
             }
 
             if ($this->enableCaching) {
@@ -392,9 +433,26 @@ class TranslationsService extends PhpMessageSource
             }
         }
 
-        // Returning array as indexed instead of associative
-        // We do this to get a nice array instead of an object when returning Json.
-        return array_values($translations);
+        // Clear out the translations that have a file translation or a db translation for both languages.
+        /*if ($prune) {
+            foreach ($translations as $key => $translation) {
+                $languages = $translation['languages'];
+                $hasEmpty = false;
+                foreach ($languages as $language) {
+                    if (empty($language['file']) && empty($language['db'])) {
+                        $hasEmpty = true;
+                        break;
+                    }
+
+                }
+
+                if (!$hasEmpty) {
+                    unset($translations[$key]);
+                }
+            }
+        }*/
+
+        return $translations;
     }
 
     public function getEnabledCategories(): array

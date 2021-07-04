@@ -1,15 +1,11 @@
 <?php
-/**
- * SettingsController.php
- */
 
 namespace moshimoshi\translationsuite\controllers;
 
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Craft;
-use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use moshimoshi\translationsuite\helpers\CpHelper;
-use moshimoshi\translationsuite\services\CategoriesService;
 use moshimoshi\translationsuite\Translationsuite;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -23,8 +19,8 @@ use yii\web\Response;
  */
 class SettingsController extends Controller
 {
-     // Constants
-     // ================================================================================================================
+    // Constants
+    // ================================================================================================================
 
     const DOCUMENTATION_URL = 'https://github.com/moshimoshi/craft-translationsuite';
 
@@ -41,7 +37,6 @@ class SettingsController extends Controller
         $variables['showWelcome'] = $showWelcome;
 
 
-
         if ($showWelcome) {
             $variables['title'] = Craft::t('translationsuite', "Welcome!");
             unset($variables['selectedSubnavItem']);
@@ -55,8 +50,59 @@ class SettingsController extends Controller
         $this->requirePermission('translationsuite:export');
         $segments = $this->request->segments;
         $variables = CpHelper::setCommonVariables($segments);
+        $variables['exportOptions'] = [
+            'all' => "All Translations",
+            'db'  => "Database Translations",
+        ];
+
+        $categories = array_merge([
+            'all'
+        ], Translationsuite::$plugin->translations->getEnabledCategories());
+        $categories = array_flip($categories);
+        foreach ($categories as $key => $category) {
+            $categories[$key] = ucfirst($key);
+        }
+        $variables['categories'] = $categories;
+
+        $variables['exportableFiletypes'] = [
+            'csv' => "CSV",
+            'xlsx' => "Excel"
+        ];
 
         return $this->renderTemplate('translationsuite/export/index', $variables);
+    }
+
+    public function actionExportExcel() {
+        $exportMode = $this->request->getRequiredQueryParam('export-mode');
+        $filetype = $this->request->getRequiredQueryParam('filetype');
+        $category = $this->request->getRequiredQueryParam('category');
+
+        switch ($filetype) {
+            case 'xlsx':
+                $writer = WriterEntityFactory::createXLSXWriter();
+                break;
+            case 'csv':
+            default:
+                $writer = WriterEntityFactory::createCSVWriter();
+                $filetype = 'csv';
+                break;
+        }
+
+        // Category export?
+
+        switch ($exportMode) {
+            case 'db':
+                $translations = Translationsuite::$plugin->translations->getAllTranslations(false);
+                break;
+            case 'all':
+            default:
+                $translations = Translationsuite::$plugin->translations->getAllTranslations(true);
+                break;
+        }
+
+        dd($translations);
+
+        $writer->close();
     }
 
     public function actionSettings(): Response

@@ -54,7 +54,7 @@
             <td v-show="selectedCategory == 'missing'">
               <span class="title">{{ translation.category }}</span>
             </td>
-            <td>
+            <td class="max-w-40">
               <span class="title">{{ translation.message }}</span>
             </td>
             <td v-for="(language, key) in translation.languages" :key="translation.category + '-' + index + '-' + key">

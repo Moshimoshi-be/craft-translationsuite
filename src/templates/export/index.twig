@@ -1,24 +1,42 @@
 {% extends "translationsuite/_layouts/translationsuite_cp.twig" %}
 {% import "_includes/forms" as forms %}
 
-{% do view.registerAssetBundle("moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset") %}
-
-{# Basepath for assets #}
-{% set baseAssetsUrl = view.getAssetManager().getPublishedUrl('@moshimoshi/translationsuite/web/assets/dist', true) %}
-
-{# Page specific scripts #}
-{% block head %}
-    {{ parent() }}
-    {% set scriptTagOptions = {
-        'depends': [
-            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
-        ],
-    } %}
-{#    {{ craft.translationsuite.register('/src/js/welcome.ts', false, scriptTagOptions) }}#}
-{% endblock %}
-
 {# The content of the CP Section#}
-{% set content %}
-    <h1>{{ "The only plugin to manage translations you'll ever need"|t('translationsuite') }}</h1>
-    <p class="textline">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Animi aperiam aspernatur commodi consectetur deleniti dolorum est molestiae nostrum quaerat voluptatum. Blanditiis deleniti facilis fugit id ipsum laudantium, natus quaerat voluptates?</p>
-{% endset %}
+{% block content %}
+    <div class="c-field-container">
+        <div class="w-full md:w-2/3">
+            <div class="a-lightswitch">
+                <div class="a-lightswitch__field">
+                    <form method="get">
+                        <h4>Export your translations</h4>
+                        {{ forms.select({
+                            id: 'filetype',
+                            name: 'filetype',
+                            options: exportableFiletypes
+                        }) }}
+                        {{ forms.select({
+                            id: 'category',
+                            name: 'category',
+                            options: categories
+                        }) }}
+                        {{ forms.select({
+                            id: 'export-mode',
+                            name: 'export-mode',
+                            options: exportOptions
+                        }) }}
+                        {{ csrfInput() }}
+                        {{ actionInput('translationsuite/settings/export-excel') }}
+                        <input class="btn submit" type="submit" value="Export">
+                    </form>
+                </div>
+                <div id="useTranslationFiles-desc" class="a-lightswitch__description">
+                    Choose your filetype for the export and the category as well as which translations you want to export. <br>
+                    <ul>
+                        <li>All translations: Combine translations from files and the database</li>
+                        <li>Database translations: Only export the translations from the database</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

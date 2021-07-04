@@ -192,12 +192,12 @@ class Translationsuite extends Plugin
         $subNavs = [];
         $navItem = parent::getCpNavItem();
 
-        if ($currentUser->can('translationsuite:dashboard')) {
+        /*if ($currentUser->can('translationsuite:dashboard')) {
             $subNavs['dashboard'] = [
                 'label' => Craft::t('translationsuite', 'Dashboard'),
                 'url' => 'translationsuite/dashboard'
             ];
-        }
+        }*/
 
         if ($currentUser->can('translationsuite:translations')) {
             $subNavs['translations'] = [
@@ -206,12 +206,12 @@ class Translationsuite extends Plugin
             ];
         }
 
-        if ($currentUser->can('translationsuite:export')) {
+        /*if ($currentUser->can('translationsuite:export')) {
             $subNavs['export'] = [
                 'label' => Craft::t('translationsuite', 'Export'),
                 'url' => 'translationsuite/export'
             ];
-        }
+        }*/
 
         if ($currentUser->can('translationsuite:settings')) {
             $subNavs['settings'] = [
@@ -355,8 +355,8 @@ class Translationsuite extends Plugin
     protected function adminCPRoutes(): array
     {
         return [
-            'translationsuite' => 'translationsuite/settings/dashboard',
-            'translationsuite/dashboard' => 'translationsuite/settings/dashboard',
+            'translationsuite' => 'translationsuite/translations',
+            //'translationsuite/dashboard' => 'translationsuite/settings/dashboard',
 
             'translationsuite/translations' => 'translationsuite/translations',
             'translationsuite/translations/get-languages' => 'translationsuite/translations/get-languages',
@@ -367,7 +367,8 @@ class Translationsuite extends Plugin
             'translationsuite/translations/update-translations' => 'translationsuite/translations/update-translations',
             'translationsuite/translations/delete-translations' => 'translationsuite/translations/delete-translations',
 
-            'translationsuite/export' => 'translationsuite/settings/export',
+            //'translationsuite/export' => 'translationsuite/settings/export',
+            //'translationsuite/export/export-excel' => 'translationsuite/settings/export-excel',
             'translationsuite/settings' => 'translationsuite/settings/settings',
             'translationsuite/settings/save-settings' => 'translationsuite/settings/save-settings',
             'translationsuite/settings/refresh-translation-categories' => 'translationsuite/settings/refresh-translation-categories',
@@ -377,15 +378,12 @@ class Translationsuite extends Plugin
     protected function registerCpPermissions(): array
     {
         return [
-            'translationsuite:dashboard' => [
-                'label' => Craft::t('translationsuite', 'Dashboard'),
-            ],
             'translationsuite:translations' => [
                 'label' => Craft::t('translationsuite', 'Translations')
             ],
-            'translationsuite:export' => [
-                'label' => Craft::t('translationsuite', 'Export translations'),
-            ],
+//            'translationsuite:export' => [
+//                'label' => Craft::t('translationsuite', 'Export translations'),
+//            ],
             'translationsuite:settings' => [
                 'label' => Craft::t('translationsuite', 'Access settings'),
             ]

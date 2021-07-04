@@ -1,18 +1,6 @@
 {% extends "translationsuite/_layouts/translationsuite_cp.twig" %}
 {% import "_includes/forms" as forms %}
 
-{% do view.registerAssetBundle("moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset") %}
-
-{# Page specific scripts #}
-{% block head %}
-    {{ parent() }}
-    {% set scriptTagOptions = {
-        'depends': [
-            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
-        ],
-    } %}
-{% endblock %}
-
 {# The content of the CP Section#}
 {% block content %}
     <input type="hidden" name="action" value="translationsuite/settings/save-settings">
@@ -20,12 +8,6 @@
 
     {{ redirectInput("translationsuite/settings") }}
     {% namespace 'settings' %}
-        <div class="c-field-container">
-            <div class="w-full md:w-2/3">
-                di
-            </div>
-        </div>
-
         <div class="c-field-container">
             <div class="w-full md:w-2/3">
                 <div class="a-lightswitch">

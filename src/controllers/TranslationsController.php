@@ -65,6 +65,8 @@ class TranslationsController extends Controller
             $translations = $translationService->getTranslations($category);
         }
 
+        $translations = array_values($translations);
+
         return $this->asJson($translations);
     }
 

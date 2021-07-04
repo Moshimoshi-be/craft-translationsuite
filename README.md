@@ -1,8 +1,8 @@
 # Translationsuite plugin for Craft CMS 3.x
 
-The one and only translation plugin you'll ever need.
+The one and only static translation plugin you'll ever need.
 
-![Screenshot](resources/img/plugin-logo.png)
+![Logo](src/web/assets/dist/img/Translationsuite-icon.svg)
 
 ## Requirements
 
@@ -18,13 +18,19 @@ To install the plugin, follow these instructions.
 
 2. Then tell Composer to load the plugin:
 
-        composer require moshimoshi-be/translationsuite
+        composer require moshimoshi/translationsuite
 
 3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Translationsuite.
 
 ## Translationsuite Overview
 
--Insert text here-
+Translation Suite is a plugin meant to help you with static translations. It allows you to enter translations using
+the traditional PHP files, but it also allows you to manage these translations using the UI. This way developers can
+provide translations during development while allowing the customer to overwrite these changes.
+
+Currently, preparations are being made to allow you to export your translations (files, db, combined) to csv or excel.
+This way you can easily share translations with 3rd parties for translations. The import function is also on its 
+way to allow users to import the translations.
 
 ## Configuring Translationsuite
 
@@ -38,6 +44,11 @@ To install the plugin, follow these instructions.
 
 Some things to do, and ideas for potential features:
 
-* Release it
+* Export to csv, excel
+* Import from csv, excel
+* Exports to PHP file to overwrite static translations, handy when you need to sync translations between environments.
+* GraphQL Support
+* Variable to inject translation in the window object.
+* Translate another message based on an existing message using third parties like Google translate, yandex, etc.
 
-Brought to you by [Moshi Moshi](moshimoshi.be)
+Brought to you by [Moshimoshi](moshimoshi.be)

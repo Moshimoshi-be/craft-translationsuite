@@ -89,18 +89,6 @@
                     Enable the categories you'd like to manage using the UI.
                 </div>
             </div>
-            <div class="w-full md:w-1/3">
-                {% embed 'translationsuite/_includes/infobox/infobox.twig' with {icon:'warning', classes: 'md:ml-4 md:mt-0'} %}
-                    {% block content %}
-                        <ol>
-                            <li>If you're missing categories, try clearing the cache.</li>
-                            <li>Make sure to only select the categories you want to manage, some categories might contain a lot of translations and will fill up your database.</li>
-                            <li>If you are still missing categories after clearing the cache, make sure you've added your translations as described in the <a href="https://craftcms.com/docs/3.x/sites.html#provide-the-translations" target="_blank" rel="noopener">Craft CMS Documentation</a></li>
-                            <p>Every file added in the translations folder will be registered as a category</p>
-                        </ol>
-                    {% endblock %}
-                {% endembed %}
-            </div>
         </div>
     {% endnamespace %}
 {% endblock %}

@@ -79,6 +79,6 @@ Some things to do, and ideas for potential features:
 * Translate another translation based on an existing translation using third parties like Google translate, yandex, etc.
 
 
-Huge thanks to [Nystudio107](nystudio107.com) for all the great blogs, podcasts and so much more 🙇‍♂️
+Huge thanks to [Nystudio107](https://nystudio107.com) for all the great blogs, podcasts and so much more 🙇‍♂️
 
-Brought to you by [Moshimoshi](moshimoshi.be)
+Brought to you by [Moshimoshi](https://moshimoshi.be)

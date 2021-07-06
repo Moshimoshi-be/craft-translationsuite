@@ -142,6 +142,7 @@ export default defineComponent({
           this.category = '';
           this.message = '';
           this.$store.commit('incrementMissingTranslations');
+          this.$toast.success("Added a new message");
         }
       });
     },

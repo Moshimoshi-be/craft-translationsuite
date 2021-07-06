@@ -140,6 +140,9 @@ class TranslationsController extends Controller
             }
         }
 
+        // After adding/updating translations, wipe the cache
+        Translationsuite::$plugin->translations->invalidateTranslationsCaches();
+
         return $this->asJson([]);
     }
 
@@ -154,6 +157,9 @@ class TranslationsController extends Controller
                 'message' => $translation['message']
             ]);
         }
+
+        // After deleting translations, wipe the cache
+        Translationsuite::$plugin->translations->invalidateTranslationsCaches();
 
         return $this->asJson([]);
     }

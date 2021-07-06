@@ -1,10 +1,11 @@
 import {createApp, defineComponent, defineAsyncComponent} from 'vue';
 import {createStore} from "vuex";
+import axios from "axios";
+import Toaster from "@meforma/vue-toaster";
 import Toolbar from "@/vue/translationmanager/Toolbar.vue";
 import Sidebar from "@/vue/translationmanager/Sidebar.vue";
 import Main from "@/vue/translationmanager/Main.vue";
 import Pagination from "@/vue/translationmanager/Pagination.vue";
-import axios from "axios";
 
 const store = createStore({
     state() {
@@ -117,7 +118,6 @@ const store = createStore({
             }
             state.paginatorOffset += state.paginatorStep;
             state.paginatorLimit = state.paginatorOffset + state.paginatorStep;
-            console.log("next page", state.paginatorOffset, state.paginatorLimit);
         },
         previousPageOfTranslations(state) {
             if (state.paginatorOffset == 0) {
@@ -125,7 +125,6 @@ const store = createStore({
             }
             state.paginatorOffset -= state.paginatorStep;
             state.paginatorLimit = state.paginatorOffset + state.paginatorStep;
-            console.log("prev page", state.paginatorOffset, state.paginatorLimit)
         },
         deleteSelectedTranslations(state) {
             const selectedTranslations = state.filteredTranslations.filter(translation => translation.selected == 1);
@@ -140,13 +139,13 @@ const store = createStore({
 
             axios.post("/admin/translationsuite/translations/delete-translations", data).then(response => {
                 state.translations = state.filteredTranslations = state.translations.filter(function(e) {
+                    app.$toast.success("Successfully deleted!");
                     return this.indexOf(e) < 0;
                 }, selectedTranslations);
             });
         },
         updateChangedTranslations(state) {
             const changedTranslations = state.translations.filter(translation => translation.changed);
-            console.log(changedTranslations);
             const data = {
               translations: changedTranslations,
             };
@@ -154,6 +153,7 @@ const store = createStore({
                 for (let translation of changedTranslations) {
                     translation.changed = false;
                 }
+                app.$toast.success("Successfully translated!");
             }).catch(error => {
                 console.error(error)
             });
@@ -218,6 +218,14 @@ app.config.globalProperties.$filters = {
         return value.charAt(0).toUpperCase() + value.slice(1);
     }
 }
+
+// Libraries
 app.use(store);
+app.use(Toaster, {
+    position: "top-right",
+    duration: 2500,
+    queue: true,
+});
+
 app.mount('#main');
 

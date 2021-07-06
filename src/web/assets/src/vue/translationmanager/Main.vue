@@ -150,7 +150,7 @@ export default defineComponent({
       clearTimeout(this.timeout);
       this.timeout = setTimeout(_ => {
         translation.changed = true;
-      }, 250);
+      }, 100);
     }
   }
 });

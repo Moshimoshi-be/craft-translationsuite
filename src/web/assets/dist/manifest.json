@@ -16,7 +16,7 @@
     ]
   },
   "src/js/translationmanager.ts": {
-    "file": "assets/translationmanager.1dc78385.js",
+    "file": "assets/translationmanager.14356b9e.js",
     "src": "src/js/translationmanager.ts",
     "isEntry": true,
     "imports": [

@@ -36,8 +36,8 @@
         "handle": "translationsuite",
         "developer": "Moshi Moshi",
         "developerUrl": "moshimoshi.be",
-        "documentationUrl": "https://github.com/moshimoshi-be/translationsuite/blob/master/README.md",
-        "changelogUrl": "https://raw.githubusercontent.com/moshimoshi-be/translationsuite/master/CHANGELOG.md",
+        "documentationUrl": "https://github.com/moshimoshi-be/craft-translationsuite/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/moshimoshi-be/craft-translationsuite/master/CHANGELOG.md",
         "components": {
             "translationsuiteService": "CategoriesService"
         },

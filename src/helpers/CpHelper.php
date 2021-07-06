@@ -15,7 +15,7 @@ use moshimoshi\translationsuite\Translationsuite;
  */
 class CpHelper
 {
-    const DOCUMENTATION_URL = 'https://github.com/moshimoshi/craft-translationsuite';
+    const DOCUMENTATION_URL = 'https://github.com/moshimoshi-be/craft-translationsuite';
 
     public static function setCommonVariables(array $segments): array
     {

@@ -2,7 +2,7 @@
     "name": "moshimoshi/craft-translationsuite",
     "description": "The one and only static translation plugin you'll ever need.",
     "type": "craft-plugin",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "keywords": [
         "craft",
         "cms",

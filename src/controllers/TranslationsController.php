@@ -25,11 +25,18 @@ class TranslationsController extends Controller
 
     public $enableCsrfValidation = false;
 
-    public function actionIndex() {
+    public function actionIndex(bool $showWelcome = false) {
         $segments = $this->request->segments;
         $variables = CpHelper::setCommonVariables($segments);
         $variables['title'] = Craft::t('translationsuite', "Translations");
         $variables['selectedSubnavItem'] = 'translations';
+        $variables['showWelcome'] = $showWelcome;
+
+
+        if ($showWelcome) {
+            $variables['title'] = Craft::t('translationsuite', "Welcome!");
+            unset($variables['selectedSubnavItem']);
+        }
 
         return $this->renderTemplate('translationsuite/translations/index', $variables);
     }

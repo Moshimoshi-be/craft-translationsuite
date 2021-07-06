@@ -13,21 +13,48 @@
         ],
     } %}
     {{ craft.translationsuite.register('/src/js/translationmanager.ts', false, scriptTagOptions) }}
+    {% if showWelcome %}
+        {{ craft.translationsuite.register('/src/js/welcome.ts', false, scriptTagOptions) }}
+    {% endif %}
 {% endblock %}
 
 {% block toolbar %}
-    <toolbar></toolbar>
+    {% if not showWelcome %}
+        <toolbar></toolbar>
+    {% endif %}
 {% endblock %}
 
 {% block sidebar %}
-    <sidebar></sidebar>
+    {% if not showWelcome %}
+        <sidebar></sidebar>
+    {% endif %}
 {% endblock %}
 
 {# The content of the CP Section#}
 {% set content %}
-    <manager></manager>
+    {% if showWelcome %}
+        <div id="app-welcome"></div>
+        <div class="readable text-center mx-auto">
+            <img
+                    src="{{ baseAssetsUrl ~ '/img/Translationsuite-icon.svg' }}"
+                    alt="Translation suitelogo"
+                    class="w-1/5 h-auto"
+                    width="20%"
+            >
+            <h2>Thanks for choosing Translation Suite</h2>
+            <div class="w-1/2 mx-auto">
+                <p>Translation Suite facilitates the process of translating static content in development with the possibility to manage the translations through the Craft control panel.</p>
+                <p>For more information, please <a href="{{ docsUrl }}" target="_blank" rel="noopener">see the documentation</a></p>
+                <a href="{{ cpUrl('translationsuite/settings') }}" class="a-button--primary mt-8 mb-12">Go to the settings</a>
+            </div>
+        </div>
+    {% else %}
+        <manager></manager>
+    {% endif %}
 {% endset %}
 
 {% set footer %}
-    <pagination></pagination>
+    {% if not showWelcome %}
+        <pagination></pagination>
+    {% endif %}
 {% endset %}

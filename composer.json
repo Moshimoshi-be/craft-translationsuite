@@ -1,6 +1,6 @@
 {
     "name": "moshimoshi/craft-translationsuite",
-    "description": "The one and only static translation plugin you'll ever need.",
+    "description": "Translation Suite allows developers to provide static translations during development while allowing the user to manage these translations through the use of a user interface.",
     "type": "craft-plugin",
     "version": "1.0.2",
     "keywords": [

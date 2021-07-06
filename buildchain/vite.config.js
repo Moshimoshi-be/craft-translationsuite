@@ -13,6 +13,7 @@ export default ({ command }) => ({
       input: {
         app: '/src/js/app.ts',
         welcome: '/src/js/welcome.ts',
+        translationmanager: '/src/js/translationmanager.ts',
       },
       output: {
         sourcemap: true

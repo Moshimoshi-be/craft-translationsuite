@@ -3,11 +3,12 @@
 Translation Suite allows developers to provide static translations during development while allowing
 the user to manage these translations through the use of a user interface. 
 
-![Logo](resources/img/plugin-logo.svg)
+![Logo](resources/img/translationsuite-banner-lowres.jpg)
+**Note:** *This plugin is available in the plugin store.*
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 3.0.0 or later.
 
 ## Installation
 

@@ -3,7 +3,7 @@
 Translation Suite allows developers to provide static translations during development while allowing
 the user to manage these translations through the use of a user interface. 
 
-![Logo](resources/img/translationsuite-banner-lowres.jpg)
+![Logo](resources/img/translationsuite-banner.jpg)
 **Note:** *This plugin is available in the plugin store.*
 
 ## Requirements

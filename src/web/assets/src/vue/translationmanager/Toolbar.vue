@@ -58,9 +58,8 @@ export default defineComponent({
       ) {
         return;
       }
-      console.log(this.filter)
+      this.$store.commit('resetPageOfTranslations');
       let filtered = [];
-      console.log(this.translations);
       filtered = this.translations.filter(translation => {
         // Let's check for the translations
         const languages = translation.languages;

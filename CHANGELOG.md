@@ -1,10 +1,6 @@
 # Translation Suite Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
-
-## 1.0.3 - Not Released
+## 1.0.3 - 2021-07-09
 - Reset the pagination when searching
 - Changed paginator step to 15 translations per page.
 - Fixed an issue that didn't allow you to see the last page of translations in some cases.

@@ -17,7 +17,7 @@ const store = createStore({
             translations: [],
             filteredTranslations: [],
             paginatorLimit: 10,
-            paginatorStep: 20,
+            paginatorStep: 15,
             paginatorOffset: 0,
             languages: [],
             filter: '',
@@ -117,11 +117,12 @@ const store = createStore({
           state.paginatorLimit = state.paginatorStep;
         },
         nextPageOfTranslations(state) {
-            if (state.paginatorOffset + state.paginatorLimit > state.filteredTranslations.length) {
+            if (state.paginatorLimit > state.filteredTranslations.length) {
                 return false;
             }
             state.paginatorOffset += state.paginatorStep;
             state.paginatorLimit = state.paginatorOffset + state.paginatorStep;
+            console.log(state.paginatorOffset, state.paginatorLimit);
         },
         previousPageOfTranslations(state) {
             if (state.paginatorOffset == 0) {

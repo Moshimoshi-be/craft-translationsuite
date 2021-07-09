@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## 1.0.3 - Not Released
 - Reset the pagination when searching
+- Changed paginator step to 15 translations per page.
+- Fixed an issue that didn't allow you to see the last page of translations in some cases.
 
 ## 1.0.2 - 2021-07-06
 ### Changed

@@ -2,7 +2,7 @@
   <div id="count-container" class="light flex-grow" v-if="selectedCategory != 'add'">
     <div class="flex pagination">
       <div @click="previousPageOfTranslations" class="page-link prev-page" :class="{'disabled': paginatorOffset == 0 }" title="Previous Page"></div>
-      <div @click="nextPageOfTranslations" class="page-link next-page" :class="{'disabled': (paginatorOffset + paginatorLimit) >= amountOfTranslations }" title="Next Page"></div>
+      <div @click="nextPageOfTranslations" class="page-link next-page" :class="{'disabled': paginatorLimit > amountOfTranslations }" title="Next Page"></div>
       <div class="page-info">{{ paginatorOffset }}-{{ amountOfResults }} of {{ amountOfTranslations }} entries</div>
     </div>
   </div>

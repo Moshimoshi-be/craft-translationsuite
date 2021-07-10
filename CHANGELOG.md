@@ -2,6 +2,7 @@
 
 ## 1.0.4 - Not Released
 - Allows the user to save missing translations
+- Removed third party translations like Yii, App, other plugins, etc
 
 ## 1.0.3 - 2021-07-09
 - Reset the pagination when searching

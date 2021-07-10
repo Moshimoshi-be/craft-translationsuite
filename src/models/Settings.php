@@ -52,6 +52,11 @@ class Settings extends Model
      */
     public $enableCaching = true;
 
+    /**
+     * @var bool
+     */
+    public $saveMissingTranslations = true;
+
     // Public Methods
     // =========================================================================
 
@@ -67,7 +72,8 @@ class Settings extends Model
             ['pluginName', 'required'],
             ['useTranslationFiles', 'boolean'],
             ['forceTranslations', 'boolean'],
-            ['enableCaching', 'boolean']
+            ['enableCaching', 'boolean'],
+            ['saveMissingTranslations', 'boolean'],
         ];
     }
 }

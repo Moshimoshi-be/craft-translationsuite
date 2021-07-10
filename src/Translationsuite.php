@@ -17,6 +17,7 @@ use craft\i18n\I18N;
 use craft\services\UserPermissions;
 use craft\utilities\ClearCaches;
 use moshimoshi\translationsuite\assetbundles\translationsuite\TranslationsuiteAsset;
+use moshimoshi\translationsuite\records\SourceMessageRecord;
 use moshimoshi\translationsuite\services\TranslationsService;
 use moshimoshi\translationsuite\services\CategoriesService;
 use moshimoshi\translationsuite\variables\TranslationsuiteVariable;
@@ -106,6 +107,12 @@ class Translationsuite extends Plugin
     // Static Methods
     // =========================================================================
 
+    /**
+     * Translationsuite constructor.
+     * @param $id
+     * @param null $parent
+     * @param array $config
+     */
     public function __construct($id, $parent = null, array $config = [])
     {
         $config['components'] = [
@@ -186,6 +193,10 @@ class Translationsuite extends Plugin
         );
     }
 
+    /**
+     * Register our navigation items
+     * @return array|null
+     */
     public function getCpNavItem()
     {
         $currentUser = Craft::$app->getUser()->getIdentity();
@@ -232,6 +243,10 @@ class Translationsuite extends Plugin
         return $navItem;
     }
 
+    /**
+     * Get the settings page.
+     * @return Response
+     */
     public function getSettingsResponse(): Response
     {
         return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('translationsuite/settings'));
@@ -250,6 +265,9 @@ class Translationsuite extends Plugin
         return new Settings();
     }
 
+    /**
+     * Attach our event listeners
+     */
     protected function attachEventListeners() {
         $request = Craft::$app->getRequest();
 
@@ -312,17 +330,43 @@ class Translationsuite extends Plugin
             }
         );
 
-        // Gotta catch them all,
-        // if enabled in settings add all the missing translations (not in file or db) to the database.
-        Event::on(
-            TranslationsService::class,
-            TranslationsService::EVENT_MISSING_TRANSLATION,
-            function(Event $event) {
-                // Do something when a translation is not found
-            }
-        );
+        if ($this->getSettings()->saveMissingTranslations) {
+            // Gotta catch them all,
+            // if enabled in settings add all the missing translations (not in file or db) to the database.
+            Event::on(
+                TranslationsService::class,
+                TranslationsService::EVENT_MISSING_TRANSLATION,
+                function(Event $event) {
+
+                    if (!Craft::$app->getRequest()->isSiteRequest) {
+                        return;
+                    }
+
+                    $categories = $this->translations->getEnabledCategories();
+                    if (!in_array($event->category, $categories, false)) {
+                        return;
+                    }
+
+                    $source = SourceMessageRecord::findOne([
+                        'category' => $event->category,
+                        'message' => $event->message,
+                    ]);
+
+                    if (!$source) {
+                        $source = new SourceMessageRecord([
+                            'category' => $event->category,
+                            'message' => $event->message
+                        ]);
+                        $source->save();
+                    }
+                }
+            );
+        }
     }
 
+    /**
+     * Attach Event listeners for the CP
+     */
     protected function attachCpEventListeners() {
         // Register CP routes
         Event::on(
@@ -352,6 +396,10 @@ class Translationsuite extends Plugin
         );
     }
 
+    /**
+     * Define routes for the CP
+     * @return string[]
+     */
     protected function adminCPRoutes(): array
     {
         return [
@@ -375,6 +423,10 @@ class Translationsuite extends Plugin
         ];
     }
 
+    /**
+     * Define the permissions
+     * @return array[]
+     */
     protected function registerCpPermissions(): array
     {
         return [
@@ -390,6 +442,10 @@ class Translationsuite extends Plugin
         ];
     }
 
+    /**
+     * Register cache options in the UI.
+     * @return array[]
+     */
     protected function registerCacheOptions(): array
     {
         return [
@@ -401,6 +457,10 @@ class Translationsuite extends Plugin
         ];
     }
 
+    /**
+     * Set our translation provider for all categories we manage.
+     * @return bool
+     */
     protected function setTranslationProvider(): bool
     {
         /** @var I18N $i18n */

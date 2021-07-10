@@ -1,5 +1,8 @@
 # Translation Suite Changelog
 
+## 1.0.4 - Not Released
+- Allows the user to save missing translations
+
 ## 1.0.3 - 2021-07-09
 - Reset the pagination when searching
 - Changed paginator step to 15 translations per page.

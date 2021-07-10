@@ -43,8 +43,17 @@ class CategoriesService extends Component
     public function setTranslationsCategoriesSettings(): bool
     {
         /** @var I18N $i18n */
-        $i18n = Craft::$app->getComponents(false)['i18n'];
-        $categories = array_keys($i18n->translations);
+        $i18n = Craft::$app->getComponents(true)['i18n'];
+
+        $categories = array_keys(
+            array_filter($i18n->translations, function ($value) {
+                if (is_array($value)) {
+                    return $value['basePath'] === "@translations";
+                }
+                return $value->basePath === "@translations";
+            })
+        );
+
         $categoriesFromFiles = $this->getCategoriesFromFiles();
         $categories = array_merge($categories, $categoriesFromFiles);
         $categories = array_fill_keys($categories, 0);

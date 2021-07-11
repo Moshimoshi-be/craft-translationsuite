@@ -2,8 +2,13 @@
 
 namespace moshimoshi\translationsuite\controllers;
 
+use Box\Spout\Common\Entity\Style\Border;
+use Box\Spout\Common\Entity\Style\Color;
+use Box\Spout\Writer\Common\Creator\Style\BorderBuilder;
+use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Craft;
+use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use moshimoshi\translationsuite\helpers\CpHelper;
 use moshimoshi\translationsuite\Translationsuite;
@@ -22,7 +27,7 @@ class SettingsController extends Controller
     // Constants
     // ================================================================================================================
 
-    const DOCUMENTATION_URL = 'https://github.com/moshimoshi/craft-translationsuite';
+    const DOCUMENTATION_URL = 'https://github.com/moshimoshi-be/craft-translationsuite';
 
     // Protected Properties
     // =================================================================================================================
@@ -73,36 +78,63 @@ class SettingsController extends Controller
     }
 
     public function actionExportExcel() {
-        $exportMode = $this->request->getRequiredQueryParam('export-mode');
         $filetype = $this->request->getRequiredQueryParam('filetype');
         $category = $this->request->getRequiredQueryParam('category');
 
         switch ($filetype) {
             case 'xlsx':
                 $writer = WriterEntityFactory::createXLSXWriter();
+                $filetype = '.xlsx';
                 break;
             case 'csv':
             default:
                 $writer = WriterEntityFactory::createCSVWriter();
-                $filetype = 'csv';
+                $writer->setFieldDelimiter(';');
+                $filetype = '.csv';
                 break;
         }
 
-        // Category export?
+        $today = new \DateTime();
+        $tmpPath = Craft::$app->getPath()->getTempPath();
+        $filename = 'translationsuite-export-' . $category . "-" . $today->format('YmdHis') . $filetype;
+        $filepath = $tmpPath . "/" . $filename;
+        $writer->openToFile($filepath);
 
-        switch ($exportMode) {
-            case 'db':
-                $translations = Translationsuite::$plugin->translations->getAllTranslations(false);
-                break;
-            case 'all':
-            default:
-                $translations = Translationsuite::$plugin->translations->getAllTranslations(true);
-                break;
+        $translations = Translationsuite::$plugin->translations->getAllTranslations(true);
+        $translations = array_values($translations);
+        $translations = array_merge(...$translations);
+        $header = [
+          'Message',
+          'Category'
+        ];
+
+        $availableLanguages = reset($translations)['languages'];
+
+        foreach ($availableLanguages as $language) {
+            $header[] = strtoupper($language['locale']);
         }
+        $border = (new BorderBuilder())->setBorderBottom()->build();
+        $style = (new StyleBuilder())->setBorder($border)->setFontBold()->setFontSize(12)->build();
+        $writer->addRow(WriterEntityFactory::createRowFromArray($header)->setStyle($style));
 
-        dd($translations);
+        foreach ($translations as $message => $translation) {
+            $arr = [
+                $translation['message'],
+                $translation['category'],
+            ];
+
+            $languages = $translation['languages'];
+            foreach($languages as $language) {
+                $arr[] = $language['db'] ?? $language['file'] ?? '';
+            }
+
+            $row = WriterEntityFactory::createRowFromArray($arr);
+            $writer->addRow($row);
+        }
 
         $writer->close();
+
+        return $this->response->sendFile($filepath);
     }
 
     public function actionSettings(): Response

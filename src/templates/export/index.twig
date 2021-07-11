@@ -19,11 +19,6 @@
                             name: 'category',
                             options: categories
                         }) }}
-                        {{ forms.select({
-                            id: 'export-mode',
-                            name: 'export-mode',
-                            options: exportOptions
-                        }) }}
                         {{ csrfInput() }}
                         {{ actionInput('translationsuite/settings/export-excel') }}
                         <input class="btn submit" type="submit" value="Export">

@@ -217,12 +217,12 @@ class Translationsuite extends Plugin
             ];
         }
 
-        /*if ($currentUser->can('translationsuite:export')) {
+        if ($currentUser->can('translationsuite:export')) {
             $subNavs['export'] = [
                 'label' => Craft::t('translationsuite', 'Export'),
                 'url' => 'translationsuite/export'
             ];
-        }*/
+        }
 
         if ($currentUser->can('translationsuite:settings')) {
             $subNavs['settings'] = [
@@ -415,8 +415,8 @@ class Translationsuite extends Plugin
             'translationsuite/translations/update-translations' => 'translationsuite/translations/update-translations',
             'translationsuite/translations/delete-translations' => 'translationsuite/translations/delete-translations',
 
-            //'translationsuite/export' => 'translationsuite/settings/export',
-            //'translationsuite/export/export-excel' => 'translationsuite/settings/export-excel',
+            'translationsuite/export' => 'translationsuite/settings/export',
+            'translationsuite/export/export-excel' => 'translationsuite/settings/export-excel',
             'translationsuite/settings' => 'translationsuite/settings/settings',
             'translationsuite/settings/save-settings' => 'translationsuite/settings/save-settings',
             'translationsuite/settings/refresh-translation-categories' => 'translationsuite/settings/refresh-translation-categories',
@@ -433,9 +433,9 @@ class Translationsuite extends Plugin
             'translationsuite:translations' => [
                 'label' => Craft::t('translationsuite', 'Translations')
             ],
-//            'translationsuite:export' => [
-//                'label' => Craft::t('translationsuite', 'Export translations'),
-//            ],
+            'translationsuite:export' => [
+                'label' => Craft::t('translationsuite', 'Export translations'),
+            ],
             'translationsuite:settings' => [
                 'label' => Craft::t('translationsuite', 'Access settings'),
             ]

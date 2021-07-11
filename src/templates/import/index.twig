@@ -1,0 +1,67 @@
+{% extends "translationsuite/_layouts/translationsuite_cp.twig" %}
+{% import "_includes/forms" as forms %}
+
+{% block head %}
+    {{ parent() }}
+
+    {% set scriptTagOptions = {
+        'depends': [
+            'moshimoshi\\translationsuite\\assetbundles\\translationsuite\\TranslationsuiteAsset'
+        ],
+    } %}
+    {{ craft.translationsuite.register('/src/js/import.ts', false, scriptTagOptions) }}
+{% endblock %}
+
+{# The content of the CP Section#}
+{% block content %}
+    {% embed "translationsuite/_includes/infobox/infobox" with { classes: 'mb-4'} %}
+        {% block content %}
+            Drag and drop the columns in the right order of your import file. This let's you organize and select the columns you want to import.
+            <br>
+            If you don't want to include certain columns (like a certain language for example) you can leave them out of the "selected columns".
+            <br>
+            It's very important to make sure the order of the columns is correct.
+        {% endblock %}
+    {% endembed %}
+
+    <section class="flex flex-nowrap justify-between items-start" id="importContainer">
+        <div class="flex-1 draggable-container">
+            <div class="draggable-container__header">
+                <h2>Columns</h2>
+            </div>
+            <div class="draggable-container__content">
+                <draggable
+                        v-model="selection"
+                        group="people"
+                        @start="drag=true"
+                        @end="drag=false"
+                        item-key="id">
+                    <template #item="{element}">
+                        <div class="draggable-container__content__item">
+                            ${element.name}
+                        </div>
+                    </template>
+                </draggable>
+            </div>
+
+        </div>
+        <div class="flex-1 draggable-container">
+            <div class="draggable-container__header">
+                <h2>Selection</h2>
+            </div>
+            <div class="draggable-container__content">
+                <draggable
+                        v-model="list"
+                        group="people"
+                        @start="drag=true"
+                        @end="drag=false"
+                        item-key="id">
+                    <template #item="{element}">
+                        <div class="draggable-container__content__item">
+                            ${element.name}
+                        </div>
+                    </template>
+                </draggable>
+            </div>
+    </section>
+{% endblock %}

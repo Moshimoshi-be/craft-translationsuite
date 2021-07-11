@@ -142,6 +142,19 @@ class SettingsController extends Controller
         return $this->response->sendFile($filepath);
     }
 
+
+    public function actionImport() {
+        $this->requirePermission('translationsuite:import');
+        $segments = $this->request->segments;
+        $variables = CpHelper::setCommonVariables($segments);
+
+        return $this->renderTemplate('translationsuite/import/index', $variables);
+    }
+
+    public function actionImportFromFile() {
+
+    }
+
     public function actionSettings(): Response
     {
         $this->requirePermission('translationsuite:settings');

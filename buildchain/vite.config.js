@@ -38,7 +38,8 @@ export default ({ command }) => ({
     alias: {
       '@': '/src',
       'axios': '/node_modules/axios/index.d.ts',
-      'vue': '/node_modules/vue/dist/vue.esm-browser.js'
+      'vue': '/node_modules/vue/dist/vue.esm-browser.js',
+      'vuedraggable': '/node_modules/vuedraggable/src/vuedraggable.js'
     },
   },
   server: {

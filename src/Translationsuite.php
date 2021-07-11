@@ -217,6 +217,13 @@ class Translationsuite extends Plugin
             ];
         }
 
+        if ($currentUser->can('translationsuite:import')) {
+            $subNavs['import'] = [
+                'label' => Craft::t('translationsuite', 'Import'),
+                'url' => 'translationsuite/import'
+            ];
+        }
+
         if ($currentUser->can('translationsuite:export')) {
             $subNavs['export'] = [
                 'label' => Craft::t('translationsuite', 'Export'),
@@ -417,6 +424,8 @@ class Translationsuite extends Plugin
 
             'translationsuite/export' => 'translationsuite/settings/export',
             'translationsuite/export/export-file' => 'translationsuite/settings/export-to-file',
+            'translationsuite/import' => 'translationsuite/settings/import',
+            'translationsuite/import/import-file' => 'translationsuite/settings/import-from-file',
             'translationsuite/settings' => 'translationsuite/settings/settings',
             'translationsuite/settings/save-settings' => 'translationsuite/settings/save-settings',
             'translationsuite/settings/refresh-translation-categories' => 'translationsuite/settings/refresh-translation-categories',
@@ -435,6 +444,9 @@ class Translationsuite extends Plugin
             ],
             'translationsuite:export' => [
                 'label' => Craft::t('translationsuite', 'Export translations'),
+            ],
+            'translationsuite:import' => [
+                'label' => Craft::t('translationsuite', 'Import translations'),
             ],
             'translationsuite:settings' => [
                 'label' => Craft::t('translationsuite', 'Access settings'),

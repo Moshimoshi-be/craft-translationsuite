@@ -1,10 +1,10 @@
 {
   "src/js/app.ts": {
-    "file": "assets/app.877f37e7.js",
+    "file": "assets/app.92098830.js",
     "src": "src/js/app.ts",
     "isEntry": true,
     "css": [
-      "assets/app.d8ab8719.css"
+      "assets/app.6353d967.css"
     ]
   },
   "src/js/welcome.ts": {

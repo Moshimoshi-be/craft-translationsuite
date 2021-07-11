@@ -100,9 +100,14 @@ class SettingsController extends Controller
         $filepath = $tmpPath . "/" . $filename;
         $writer->openToFile($filepath);
 
-        $translations = Translationsuite::$plugin->translations->getAllTranslations(true);
-        $translations = array_values($translations);
-        $translations = array_merge(...$translations);
+        if ($category == 'all') {
+            $translations = Translationsuite::$plugin->translations->getAllTranslations(true);
+            $translations = array_values($translations);
+            $translations = array_merge(...$translations);
+        } else {
+            $translations = Translationsuite::$plugin->translations->getTranslations($category);
+        }
+
         $header = [
           'Message',
           'Category'

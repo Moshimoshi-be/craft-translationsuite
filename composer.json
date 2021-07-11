@@ -2,7 +2,7 @@
     "name": "moshimoshi/craft-translationsuite",
     "description": "Translation Suite allows developers to provide static translations during development while allowing the user to manage these translations through the use of a user interface.",
     "type": "craft-plugin",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "keywords": [
         "craft",
         "cms",
@@ -11,8 +11,8 @@
         "translationsuite"
     ],
     "support": {
-        "docs": "https://github.com/moshimoshi-be/translationsuite/blob/master/README.md",
-        "issues": "https://github.com/moshimoshi-be/translationsuite/issues"
+        "docs": "https://github.com/Moshimoshi-be/craft-translationsuite/blob/master/README.md",
+        "issues": "https://github.com/moshimoshi-be/craft-translationsuite/issues"
     },
     "license": "proprietary",
     "authors": [

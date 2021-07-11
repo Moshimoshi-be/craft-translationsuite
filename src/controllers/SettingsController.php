@@ -77,7 +77,7 @@ class SettingsController extends Controller
         return $this->renderTemplate('translationsuite/export/index', $variables);
     }
 
-    public function actionExportExcel() {
+    public function actionExportToFile() {
         $filetype = $this->request->getRequiredQueryParam('filetype');
         $category = $this->request->getRequiredQueryParam('category');
 

@@ -416,7 +416,7 @@ class Translationsuite extends Plugin
             'translationsuite/translations/delete-translations' => 'translationsuite/translations/delete-translations',
 
             'translationsuite/export' => 'translationsuite/settings/export',
-            'translationsuite/export/export-excel' => 'translationsuite/settings/export-excel',
+            'translationsuite/export/export-file' => 'translationsuite/settings/export-to-file',
             'translationsuite/settings' => 'translationsuite/settings/settings',
             'translationsuite/settings/save-settings' => 'translationsuite/settings/save-settings',
             'translationsuite/settings/refresh-translation-categories' => 'translationsuite/settings/refresh-translation-categories',

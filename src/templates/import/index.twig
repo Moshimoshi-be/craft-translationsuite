@@ -20,10 +20,26 @@
         <section class="mb-4">
             <div class="a-lightswitch">
                 <div class="a-lightswitch__field p-4">
+                    <h3>Choose a file: </h3>
                     <input type="file" name="translations" accept=".csv, .xlsx" />
                 </div>
                 <div id="file-desc" class="a-lightswitch__description">
                     Choose the file to import
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-4">
+            <div class="a-lightswitch">
+                <div class="a-lightswitch__field p-4">
+                    <h3>File contains headers?</h3>
+                    <label for="headers" class="flex items-center">
+                        <input type="checkbox" name="headers">&nbsp;
+                        <span>Yes</span>
+                    </label>
+                </div>
+                <div id="headers-desc" class="a-lightswitch__description">
+                    Does the first line in your import file contain headers that should be skipped?
                 </div>
             </div>
         </section>
@@ -75,6 +91,7 @@
             {% block content %}
                 <ol>
                     <li>Choose the file you want to import.</li>
+                    <li>Check the checkbox if your file contains headers.</li>
                     <li>Make a selection of columns and order them in the same way as in the file.</li>
                 </ol>
                 <strong>Be careful when importing because you'll be overwriting your translations.</strong>

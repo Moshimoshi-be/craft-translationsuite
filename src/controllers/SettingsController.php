@@ -160,6 +160,7 @@ class SettingsController extends Controller
 
     public function actionImportFromFile() {
         $columns = $this->request->getRequiredBodyParam('columns');
+        $headers = $this->request->getBodyParam('headers');
         $columns = Json::decode($columns);
 
         // Validation of some required columns
@@ -193,7 +194,10 @@ class SettingsController extends Controller
             $reader->open($filepath);
 
             foreach ($reader->getSheetIterator() as $sheet) {
-                foreach ($sheet->getRowIterator() as $row) {
+                foreach ($sheet->getRowIterator() as $key => $row) {
+                    if ($headers && $key === 1) {
+                        continue;
+                    }
                     $items = $row->toArray();
                     $itemsAmount = count($items);
                     $columnsAmount = count($columns);

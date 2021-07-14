@@ -1,11 +1,21 @@
 # Translation Suite Changelog
 
-## 1.0.4 - Not Released
-- Allows the user to save missing translations
-- Removed third party translations like Yii, App, other plugins, etc
+## 1.0.5 - Not released
+### Added
+- Import translations from excel or csv.
+
+### Fixed
+- Fixed an issue when adding translations for languages that are not added yet. This happened when adding extra languages afterwards.
+
+## 1.0.4 - 2021-07-11
+### Added
 - Export the translations to csv or Excel files
+### Changed
+- Allows the user to save missing translations that are used but not found
+- Removed third party translations like Yii, App, other plugins, etc
 
 ## 1.0.3 - 2021-07-09
+### Changed
 - Reset the pagination when searching
 - Changed paginator step to 15 translations per page.
 - Fixed an issue that didn't allow you to see the last page of translations in some cases.

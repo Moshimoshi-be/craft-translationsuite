@@ -11,20 +11,33 @@ const main = async () => {
             enabled: true,
             dragging: false,
             list: [
-                { name: "Message", id: 1 },
-                { name: "Translation", id: 2 },
-                { name: "Category", id: 3 },
-                { name: "EN", id: 4 },
-                { name: "ES", id: 5 },
-                { name: "FR", id: 6 },
+
             ],
             selection: [
-
-            ]
+                { name: "Message", type: 'message' },
+                { name: "Category", type: 'category' },
+            ],
         }),
+        computed: {
+          selectionList() {
+              return JSON.stringify(this.selection);
+          }
+        },
         methods: {
             log(event) {
                 console.log(event);
+            }
+        },
+        mounted() {
+            // @ts-ignore
+            const languages = window.Translationsuite.getActiveLanguages();
+            for (let language of languages) {
+                this.list.push(
+                    {
+                        name: language.toUpperCase(),
+                        type: 'language'
+                    }
+                )
             }
         }
     }));

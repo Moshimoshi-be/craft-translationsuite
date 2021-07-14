@@ -4,13 +4,20 @@ namespace moshimoshi\translationsuite\controllers;
 
 use Box\Spout\Common\Entity\Style\Border;
 use Box\Spout\Common\Entity\Style\Color;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use Box\Spout\Reader\CSV\SheetIterator;
 use Box\Spout\Writer\Common\Creator\Style\BorderBuilder;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use Box\Spout\Writer\Common\Entity\Sheet;
 use Craft;
+use craft\helpers\Json;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
+use craft\web\UploadedFile;
 use moshimoshi\translationsuite\helpers\CpHelper;
+use moshimoshi\translationsuite\records\MessageRecord;
+use moshimoshi\translationsuite\records\SourceMessageRecord;
 use moshimoshi\translationsuite\Translationsuite;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -152,7 +159,102 @@ class SettingsController extends Controller
     }
 
     public function actionImportFromFile() {
+        $columns = $this->request->getRequiredBodyParam('columns');
+        $columns = Json::decode($columns);
 
+        // Validation of some required columns
+        $types = array_column($columns, 'type');
+        if (!in_array('language', $types, true)) {
+            Craft::$app->getSession()->setError("Your selection of columns should contain at least 1 language");
+            return $this->redirectToPostedUrl();
+        }
+        if (!in_array('message', $types, true)) {
+            Craft::$app->getSession()->setError("Your selection of columns should contain the message column");
+            return $this->redirectToPostedUrl();
+        }
+        if (!in_array('category', $types, true)) {
+            Craft::$app->getSession()->setError("Your selection of columns should contain the category column");
+            return $this->redirectToPostedUrl();
+        }
+
+        $columns = array_column($columns, 'name');
+        $columns = array_map('strtolower', $columns);
+        $translationsFile = UploadedFile::getInstanceByName('translations');
+
+        if ($translationsFile) {
+            $today = new \DateTime();
+            $tempPath = Craft::$app->getPath()->getTempPath();
+            $extension = $translationsFile->extension;
+            $name = "translationsuite-import-" . $today->format('YmdHis') . "." . $extension;
+            $filepath = $tempPath . "/" . $name;
+            $translationsFile->saveAs($filepath);
+
+            $reader = ReaderEntityFactory::createReaderFromFile($filepath);
+            $reader->open($filepath);
+
+            foreach ($reader->getSheetIterator() as $sheet) {
+                foreach ($sheet->getRowIterator() as $row) {
+                    $items = $row->toArray();
+                    $itemsAmount = count($items);
+                    $columnsAmount = count($columns);
+
+                    // Make sure our arrays have the same length to combine.
+                    if ($itemsAmount > $columnsAmount) {
+                        $items = array_slice($items, 0, $columnsAmount);
+                    }
+                    if ($columnsAmount > $itemsAmount) {
+                        $items = array_pad($items, $columnsAmount, null);
+                    }
+                    $combined = array_combine($columns, $items);
+
+                    $messageRecords = MessageRecord::find()
+                        ->from(['m' => MessageRecord::tableName()])
+                        ->leftJoin(['t' => SourceMessageRecord::tableName()], 't.id = m.id')
+                        ->where([
+                            't.category' => $combined['category'],
+                            't.message' => $combined['message'],
+                        ])
+                        ->all();
+
+                    if (!$messageRecords) {
+                        $sourceRecord = new SourceMessageRecord([
+                            'category' => $combined['category'],
+                            'message' => $combined['message'],
+                        ]);
+                        $sourceRecord->save();
+                        $messageRecords = MessageRecord::findAll(['id' => $sourceRecord->id]);
+                    }
+
+                    // Remove category and message so we only keep the translations
+                    unset($combined['category'], $combined['message']);
+
+                    // Loop over translations, set translations and save.
+                    foreach ($combined as $language => $translation) {
+                        $messageRecord = array_filter($messageRecords, function ($record) use ($language) {
+                            return $record->language == $language;
+                        });
+
+                        // Apparently a language that wasn't added before.
+                        // Let's add it now.
+                        if (!$messageRecord) {
+                            $messageRecord =  new MessageRecord([
+                                'id' => reset($messageRecords)->id,
+                                'language' => $language,
+                                'translation' => $translation,
+                            ]);
+                            $messageRecord->save();
+                        } else {
+                            $messageRecord = reset($messageRecord);
+                            $messageRecord->translation = $translation;
+                            $messageRecord->save();
+                        }
+                    }
+                }
+            }
+        }
+
+        Craft::$app->session->setNotice(Craft::t('translationsuite', 'The translations were imported!'));
+        return $this->redirectToPostedUrl();
     }
 
     public function actionSettings(): Response

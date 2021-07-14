@@ -18,6 +18,7 @@ use craft\services\UserPermissions;
 use craft\utilities\ClearCaches;
 use moshimoshi\translationsuite\assetbundles\translationsuite\TranslationsuiteAsset;
 use moshimoshi\translationsuite\records\SourceMessageRecord;
+use moshimoshi\translationsuite\services\ExportService;
 use moshimoshi\translationsuite\services\TranslationsService;
 use moshimoshi\translationsuite\services\CategoriesService;
 use moshimoshi\translationsuite\variables\TranslationsuiteVariable;
@@ -53,6 +54,7 @@ use yii\web\Response;
  *
  * @property  CategoriesService $categories
  * @property  TranslationsService $translations
+ * @property  ExportService $export
  * @property  VitePluginService $vite
  * @method    Settings getSettings()
  */
@@ -118,6 +120,7 @@ class Translationsuite extends Plugin
         $config['components'] = [
             'translationsuite' => __CLASS__,
             'categories' => CategoriesService::class,
+            'export' => ExportService::class,
             // Register the vite service
             'vite' => [
                 'class' => VitePluginService::class,

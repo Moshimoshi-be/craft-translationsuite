@@ -78,34 +78,16 @@ class SettingsController extends Controller
 
         $variables['exportableFiletypes'] = [
             'csv' => "CSV",
-            'xlsx' => "Excel"
+            'xlsx' => "Excel",
+            'php' => "PHP",
         ];
 
         return $this->renderTemplate('translationsuite/export/index', $variables);
     }
 
     public function actionExportToFile() {
-        $filetype = $this->request->getRequiredQueryParam('filetype');
+        $filetype = "." . $this->request->getRequiredQueryParam('filetype');
         $category = $this->request->getRequiredQueryParam('category');
-
-        switch ($filetype) {
-            case 'xlsx':
-                $writer = WriterEntityFactory::createXLSXWriter();
-                $filetype = '.xlsx';
-                break;
-            case 'csv':
-            default:
-                $writer = WriterEntityFactory::createCSVWriter();
-                $writer->setFieldDelimiter(';');
-                $filetype = '.csv';
-                break;
-        }
-
-        $today = new \DateTime();
-        $tmpPath = Craft::$app->getPath()->getTempPath();
-        $filename = 'translationsuite-export-' . $category . "-" . $today->format('YmdHis') . $filetype;
-        $filepath = $tmpPath . "/" . $filename;
-        $writer->openToFile($filepath);
 
         if ($category == 'all') {
             $translations = Translationsuite::$plugin->translations->getAllTranslations(true);
@@ -115,36 +97,29 @@ class SettingsController extends Controller
             $translations = Translationsuite::$plugin->translations->getTranslations($category);
         }
 
-        $header = [
-          'Message',
-          'Category'
-        ];
+        $today = new \DateTime();
+        $tmpPath = Craft::$app->getPath()->getTempPath();
+        $filename = 'translationsuite-export-' . $category . "-" . $today->format('YmdHis') . $filetype;
+        $filepath = $tmpPath . "/" . $filename;
 
-        $availableLanguages = reset($translations)['languages'];
-
-        foreach ($availableLanguages as $language) {
-            $header[] = strtoupper($language['locale']);
+        switch ($filetype) {
+            case '.php':
+                // Actually parse the translations to this format
+                // Create a zip and add all the languages
+                // Return the zip file
+                $translations = [
+                    "abc" => "abc translated",
+                    "def" => "def translated",
+                ];
+                $filepath = Translationsuite::$plugin->export->toPhp($translations, $filepath);
+                break;
+            case '.xlsx':
+                $filepath = Translationsuite::$plugin->export->toExcel($translations, $filepath);
+                break;
+            case '.csv':
+                $filepath = Translationsuite::$plugin->export->toCsv($translations, $filepath);
+                break;
         }
-        $border = (new BorderBuilder())->setBorderBottom()->build();
-        $style = (new StyleBuilder())->setBorder($border)->setFontBold()->setFontSize(12)->build();
-        $writer->addRow(WriterEntityFactory::createRowFromArray($header)->setStyle($style));
-
-        foreach ($translations as $message => $translation) {
-            $arr = [
-                $translation['message'],
-                $translation['category'],
-            ];
-
-            $languages = $translation['languages'];
-            foreach($languages as $language) {
-                $arr[] = $language['db'] ?? $language['file'] ?? '';
-            }
-
-            $row = WriterEntityFactory::createRowFromArray($arr);
-            $writer->addRow($row);
-        }
-
-        $writer->close();
 
         return $this->response->sendFile($filepath);
     }

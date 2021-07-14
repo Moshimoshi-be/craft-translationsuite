@@ -5,17 +5,16 @@ namespace moshimoshi\translationsuite\services;
 use Box\Spout\Writer\Common\Creator\Style\BorderBuilder;
 use Box\Spout\Writer\Common\Creator\Style\StyleBuilder;
 use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
-use Box\Spout\Writer\CSV\Writer;
 use Box\Spout\Writer\WriterAbstract;
 use craft\base\Component;
-use craft\helpers\FileHelper;
 use ZipArchive;
 
 /**
  * ExportService
  *
- * @since       2021-07-14 15:19
- * @author      pieterjangeeroms
+ * @author    Moshi Moshi
+ * @package   Translationsuite
+ * @since     1.0.6
  */
 class ExportService extends Component
 {

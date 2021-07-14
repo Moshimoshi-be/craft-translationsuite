@@ -14,6 +14,7 @@ export default ({ command }) => ({
         app: '/src/js/app.ts',
         welcome: '/src/js/welcome.ts',
         translationmanager: '/src/js/translationmanager.ts',
+        import: '/src/js/import.ts'
       },
       output: {
         sourcemap: true

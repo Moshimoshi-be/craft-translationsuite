@@ -1,11 +1,12 @@
 # Translation Suite Changelog
 
-## 1.0.5 - Not released
+## 1.0.5 - 2021-07-14
 ### Added
 - Import translations from excel or csv.
 
 ### Fixed
-- Fixed an issue when adding translations for languages that are not added yet. This happened when adding extra languages afterwards.
+- Fixed an issue when adding translations for languages that are not added yet. 
+  This happened when adding extra languages after already translating the message.
 
 ## 1.0.4 - 2021-07-11
 ### Added

@@ -1,30 +1,38 @@
 {
   "src/js/app.ts": {
-    "file": "assets/app.92098830.js",
+    "file": "assets/app.ee886450.js",
     "src": "src/js/app.ts",
     "isEntry": true,
     "css": [
-      "assets/app.6353d967.css"
+      "assets/app.d2e4ac78.css"
     ]
   },
   "src/js/welcome.ts": {
-    "file": "assets/welcome.51d20427.js",
+    "file": "assets/welcome.6c2892f3.js",
     "src": "src/js/welcome.ts",
     "isEntry": true,
     "imports": [
-      "_vendor.dbcbbd25.js"
+      "_vendor.2bd584ab.js"
     ]
   },
   "src/js/translationmanager.ts": {
-    "file": "assets/translationmanager.f6e4b5fb.js",
+    "file": "assets/translationmanager.a2dc75c4.js",
     "src": "src/js/translationmanager.ts",
     "isEntry": true,
     "imports": [
-      "_vendor.dbcbbd25.js"
+      "_vendor.2bd584ab.js"
     ]
   },
-  "_vendor.dbcbbd25.js": {
-    "file": "assets/vendor.dbcbbd25.js",
+  "src/js/import.ts": {
+    "file": "assets/import.38e27db7.js",
+    "src": "src/js/import.ts",
+    "isEntry": true,
+    "imports": [
+      "_vendor.2bd584ab.js"
+    ]
+  },
+  "_vendor.2bd584ab.js": {
+    "file": "assets/vendor.2bd584ab.js",
     "css": [
       "assets/vendor.d5cbfd15.css"
     ]

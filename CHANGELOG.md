@@ -1,5 +1,10 @@
 # Translation Suite Changelog
 
+## 1.0.6 - Not released
+### Added
+- Added possibility to export translations back to static php files. 
+  This way you can easily export translations from a staging/production environment so that you can put your translations back in git.
+
 ## 1.0.5 - 2021-07-14
 ### Added
 - Import translations from excel or csv.

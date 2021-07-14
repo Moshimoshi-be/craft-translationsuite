@@ -8,6 +8,8 @@ use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
 use Box\Spout\Writer\CSV\Writer;
 use Box\Spout\Writer\WriterAbstract;
 use craft\base\Component;
+use craft\helpers\FileHelper;
+use ZipArchive;
 
 /**
  * ExportService
@@ -26,15 +28,50 @@ class ExportService extends Component
      * @return false|string
      */
     public function toPhp(array $translations, string $path) {
-        $fileContent = "<?php \n\n return [";
-        foreach ($translations as $message => $translation) {
-            $fileContent .= "\n\t\"" . $message . "\" => \"" . $translation . "\",";
+        // Actually parse the translations to this format
+        // Create a zip and add all the languages
+        // Return the zip file
+        $localizedArray = [];
+
+        foreach ($translations as $translation) {
+            foreach ($translation['languages'] as $language) {
+                $locale = $language['locale'];
+                $message = $translation['message'];
+                $category = $translation['category'];
+                $translated = $language['db'] ?? $language['file'] ?? '';
+                $localizedArray[$locale][$category][$message] = $translated;
+            }
         }
-        $fileContent .= "\n ];";
 
-        $success = file_put_contents($path, $fileContent);
+        if (!mkdir($path) && !is_dir($path)) {
+            throw new \RuntimeException(sprintf('Directory "%s" could not be created', $path));
+        }
 
-        return $success ? $path : false;
+        $zip = new ZipArchive();
+        $zipName = 'export.zip';
+        $zipPath = $path . '/' . $zipName;
+        $zip->open($zipPath, ZipArchive::CREATE);
+        $zip->filename = $zipName;
+
+        $phpPath = $path . '/files';
+        foreach ($localizedArray as $locale => $categories) {
+            foreach ($categories as $category => $translations) {
+                $phpString = $this->parseToPhp($translations);
+                $localPath = $locale . '/' . $category;
+                $translatePath = $phpPath . '/' . $localPath;
+                if (!mkdir($translatePath, 0777, true) && !is_dir($translatePath)) {
+                    throw new \RuntimeException(sprintf('Directory "%s" was not created', $translatePath));
+                }
+                $filePath = $translatePath . ".php";
+                $success = file_put_contents($filePath, $phpString);
+                $localPath .= ".php";
+                $zip->addFile($filePath, $localPath);
+            }
+        }
+
+        $zip->close();
+
+        return $success ? $zipPath : false;
     }
 
     public function toExcel(array $translations, string $filepath) {
@@ -80,5 +117,15 @@ class ExportService extends Component
             $writer->addRow($row);
         }
         $writer->close();
+    }
+
+    private function parseToPhp(array $translations) {
+        $fileContent = "<?php \n\n return [";
+        foreach ($translations as $message => $translation) {
+            $fileContent .= "\n\t\"" . $message . "\" => \"" . $translation . "\",";
+        }
+        $fileContent .= "\n ];";
+
+        return $fileContent;
     }
 }

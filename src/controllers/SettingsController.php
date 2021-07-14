@@ -86,7 +86,7 @@ class SettingsController extends Controller
     }
 
     public function actionExportToFile() {
-        $filetype = "." . $this->request->getRequiredQueryParam('filetype');
+        $filetype = $this->request->getRequiredQueryParam('filetype');
         $category = $this->request->getRequiredQueryParam('category');
 
         if ($category == 'all') {
@@ -99,24 +99,22 @@ class SettingsController extends Controller
 
         $today = new \DateTime();
         $tmpPath = Craft::$app->getPath()->getTempPath();
-        $filename = 'translationsuite-export-' . $category . "-" . $today->format('YmdHis') . $filetype;
-        $filepath = $tmpPath . "/" . $filename;
+
 
         switch ($filetype) {
-            case '.php':
-                // Actually parse the translations to this format
-                // Create a zip and add all the languages
-                // Return the zip file
-                $translations = [
-                    "abc" => "abc translated",
-                    "def" => "def translated",
-                ];
-                $filepath = Translationsuite::$plugin->export->toPhp($translations, $filepath);
+            case 'php':
+                $directory = 'translationsuite-export-' . $category . "-" . $today->format('YmdHis');
+                $path = $tmpPath . "/" . $directory;
+                $filepath = Translationsuite::$plugin->export->toPhp($translations, $path);
                 break;
-            case '.xlsx':
+            case 'xlsx':
+                $filename = 'translationsuite-export-' . $category . "-" . $today->format('YmdHis') . $filetype;
+                $filepath = $tmpPath . "/" . $filename;
                 $filepath = Translationsuite::$plugin->export->toExcel($translations, $filepath);
                 break;
-            case '.csv':
+            case 'csv':
+                $filename = 'translationsuite-export-' . $category . "-" . $today->format('YmdHis') . $filetype;
+                $filepath = $tmpPath . "/" . $filename;
                 $filepath = Translationsuite::$plugin->export->toCsv($translations, $filepath);
                 break;
         }

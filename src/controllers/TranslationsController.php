@@ -111,29 +111,32 @@ class TranslationsController extends Controller
         $translations = $this->request->getRequiredBodyParam('translations');
 
         foreach ($translations as $translation) {
+            $dbTranslations = MessageRecord::find()
+                ->from(['m' => MessageRecord::tableName()])
+                ->leftJoin(['t' => SourceMessageRecord::tableName()], 't.id = m.id')
+                ->where([
+                    't.category' => $translation['category'],
+                    't.message' => $translation['message'],
+                ])
+                ->all();
             foreach ($translation['languages'] as $locale => $translated) {
-                //$translated['db']
-                $dbTranslation = MessageRecord::find()
-                    ->from(['m' => MessageRecord::tableName()])
-                    ->leftJoin(['t' => SourceMessageRecord::tableName()], 't.id = m.id')
-                    ->where([
-                        't.category' => $translation['category'],
-                        't.message' => $translation['message'],
-                        'm.language' => $locale
-                    ])
-                    ->one();
+
+                $dbTranslation = array_filter($dbTranslations, function ($record) use ($locale) {
+                    return $record->language == $locale;
+                });
 
                 if (!$dbTranslation) {
-                    $source = new SourceMessageRecord([
-                        'category' => $translation['category'],
-                        'message' => $translation['message'],
+                    $dbTranslation = new MessageRecord([
+                        'id' => reset($dbTranslations)->id,
+                        'language' => $locale,
+                        'translation' => $translated['db'],
                     ]);
-                    $source->save();
-
-                    $dbTranslation = MessageRecord::findOne(['id' => $source->id]);
+                    $dbTranslation->save();
+                } else {
+                    $dbTranslation = reset($dbTranslation);
+                    $dbTranslation->translation = $translated['db'] ?? '';
+                    $dbTranslation->save();
                 }
-                $dbTranslation->translation = $translated['db'] ?? '';
-                $dbTranslation->save();
             }
         }
 

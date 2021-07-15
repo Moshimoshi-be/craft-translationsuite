@@ -75,7 +75,7 @@ Some things to do, and ideas for potential features:
 
 * ~~Export to csv, excel~~
 * ~~Import from csv, excel~~
-* Exports to PHP file to overwrite static translations, handy when you need to sync translations between environments.
+* ~~Exports to PHP file to overwrite static translations, handy when you need to sync translations between environments.~~
 * GraphQL Support
 * Variable to inject translation in the window object.
 * Translate another translation based on an existing translation using third parties like Google translate, yandex, etc.
